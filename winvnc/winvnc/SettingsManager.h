@@ -1,5 +1,6 @@
 #pragma once
 #include "stdhdrs.h"
+#include <string>
 #include "inifile.h"
 #include "rfb.h"
 
@@ -229,6 +230,14 @@ public:
 	void setCloudServer(TCHAR* value) { strcpy_s(m_pref_cloudServer, value); };
 	TCHAR* getCloudServer() { return m_pref_cloudServer; };
 
+	void setAuthPassword(const std::string&);
+	void setCompressLevel(const int value);
+	void setQualityLevel(const int value);
+
+	void getAuthPassword(std::string&);
+	void getCompressLevel(int&);
+	void getQualityLevel(int&);
+	
 
 #ifdef IPV6V4
 	// Whether or not to allow connections from the local machine
@@ -349,6 +358,10 @@ private:
 
 	TCHAR m_pref_cloudServer[MAX_HOST_NAME_LEN];
 	bool m_pref_cloudEnabled;
+
+	std::string m_auth_password;
+	int m_pref_CompressLevel;
+	int m_pref_QualityLevel;
 };
 
 extern SettingsManager* settings;

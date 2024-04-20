@@ -44,6 +44,7 @@
 #include <string>
 #include <sstream>
 #include "resource.h"
+#include <typeinfo>
 
 // Custom
 #include "vncserver.h"
@@ -1247,7 +1248,12 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	}		
 	else
 	{
-		vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
+		vncPasswd::ToText plain(settings ->getPasswd(), settings->getSecure(),true);
+		//char* passwd = SettingsManager::getInstance()->getAuthPassword();
+		////char* p = new char[strlen(passwd)];
+		////strcpy_s(p, passwd);
+		//strcpy(plain.plaintext,passwd);
+		//string type_name = typeid(plain).name();
 
 		if (!m_auth && m_ms_logon)
 		{
@@ -1772,7 +1778,7 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 
 BOOL vncClientThread::AuthVnc(std::string& auth_message)
 {
-	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
+	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure(),true);
 
 	BOOL auth_ok = FALSE;
 	{

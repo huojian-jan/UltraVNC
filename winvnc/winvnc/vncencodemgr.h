@@ -53,6 +53,7 @@ class vncEncodeMgr;
 #include "vncEncodeUltra.h"
 #include "vncEncodeUltra2.h"
 #include "vncbuffer.h"
+#include "SettingsManager.h"
 
 // Mapping of coarse-grained to fine-grained quality levels, inherited from
 // TigerVNC.  These map roughly to the compression ratios indicated, but only
@@ -375,7 +376,8 @@ vncEncodeMgr::CheckBuffer()
 	}
 
 	// If the client has not selected an encoding then set one for it
-	if ((m_encoder == NULL) && (!SetEncoding(rfbEncodingRaw, FALSE)))
+	//if ((m_encoder == NULL) && (!SetEncoding(rfbEncodingRaw, FALSE)))
+	if ((m_encoder == NULL) && (!SetEncoding(rfbEncodingXZYW, FALSE)))
 		return FALSE;
 
 	// Check the client buffer is sufficient
@@ -591,7 +593,8 @@ vncEncodeMgr::SetEncoding(CARD32 encoding, BOOL reinitialize)
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
-		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = FALSE;
+		//((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = FALSE;
+		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = TRUE;
 		((vncEncodeZRLE*)zrleEncoder)->set_use_zstd(false);
 		break;
 
@@ -942,7 +945,9 @@ vncEncodeMgr::IsXCursorSupported() {
 inline void
 vncEncodeMgr::SetCompressLevel(int level)
 {
-	m_compresslevel = (level >= 0 && level <= 9) ? level : 6;
+	SettingsManager::getInstance()->getCompressLevel(m_compresslevel);
+
+	//m_compresslevel = (level >= 0 && level <= 9) ? level : 6;
 	if (m_encoder != NULL)
 		m_encoder->SetCompressLevel(m_compresslevel);
 }
@@ -950,8 +955,11 @@ vncEncodeMgr::SetCompressLevel(int level)
 inline void
 vncEncodeMgr::SetQualityLevel(int level)
 {
-	m_qualitylevel = (level >= 0 && level <= 9) ? level : -1;
+	 SettingsManager::getInstance()->getQualityLevel(m_qualitylevel);
+	
+	//m_qualitylevel = (level >= 0 && level <= 9) ? level : -1;
 	m_finequalitylevel = coarsequal2finequal[level];
+	//m_qualitylevel = (level >= 0 && level <= 9) ? level :3;
 	m_subsampling = coarsequal2subsamp[level];
 	if (m_encoder != NULL) {
 		m_encoder->SetQualityLevel(m_qualitylevel);

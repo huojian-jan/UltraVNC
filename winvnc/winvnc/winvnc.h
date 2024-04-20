@@ -26,6 +26,7 @@
 
 #include "stdhdrs.h"
 #include "resource.h"
+#include "SettingsManager.h"
 
 // Application specific messages
 
@@ -67,6 +68,11 @@ const char winvncSCexit[]	= "-sc_exit";
 const char winvncSCprompt[]	= "-sc_prompt";
 const char winvncmulti[]	= "-multi";
 const char winvnchttp[]	= "-httpproxy";
+
+//additional command-line flag definitions
+const char winvncAuth[] = "-auth";
+const char winvncCompressLevel[] = "-compress";
+const char winvncQualitylevel[] = "-quality";
 
 //adzm 2009-06-20
 // for use with -sc

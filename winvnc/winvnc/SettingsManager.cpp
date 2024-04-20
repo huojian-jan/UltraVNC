@@ -458,3 +458,42 @@ bool SettingsManager::IsRunninAsAdministrator()
 	notset = true;
 	return m_pref_RunninAsAdministrator;
 };
+
+//additional command line parameters
+
+void
+SettingsManager::setAuthPassword(const std::string &value)
+{
+	m_auth_password = value;
+}
+
+void
+SettingsManager::setCompressLevel(const int value)
+{
+	m_pref_CompressLevel = value;
+}
+
+void
+SettingsManager::setQualityLevel(const int value)
+{
+	m_pref_QualityLevel = value;
+}
+
+void
+SettingsManager::getAuthPassword(std::string &value)
+{
+	value = m_auth_password;
+}
+
+void
+SettingsManager::getCompressLevel(int& value)
+{
+	value = m_pref_CompressLevel;
+}
+
+void
+SettingsManager::getQualityLevel(int& value)
+{
+	value = m_pref_QualityLevel;
+}
+

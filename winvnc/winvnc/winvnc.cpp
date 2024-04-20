@@ -1110,6 +1110,114 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				continue;
 			}
 
+			if (strncmp(&szCmdLine[i], winvncAuth, strlen(winvncAuth))==0)
+			{		
+				i += strlen(winvncAuth);
+
+				size_t start, end;
+				start = i;
+				while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+				end = start;
+				while (szCmdLine[end] > ' ') end++;
+				
+				if (end - start > 0)
+				{
+					char* auth=new char[end - start + 1];
+					if (auth != nullptr)
+					{
+						strncpy_s(auth, end - start + 1, &(szCmdLine[start]), end - start);
+						SettingsManager* settingsIns = SettingsManager::getInstance();
+						if (settingsIns != nullptr)
+						{
+							settingsIns->setAuthPassword(auth);
+							delete[] auth;
+						}
+					}
+					i = end;
+				}
+
+				continue;
+			}
+
+			if (strncmp(&szCmdLine[i], winvncCompressLevel, strlen(winvncCompressLevel)) == 0)
+			{
+				i += strlen(winvncCompressLevel);
+				size_t start, end;
+				start = i;
+				while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+				end = start;
+				while (szCmdLine[end] > ' ') end++;
+				
+				if (end - start > 0)
+				{
+					char* compress=new char[end - start + 1];
+					if (compress != nullptr)
+					{
+						strncpy_s(compress, end - start + 1, &(szCmdLine[start]), end - start);
+						int compress_level = 9;
+						try
+						{
+							compress_level=std::stoi(compress);
+						}
+						catch (const std::exception&)
+						{
+							//char* log_str = "compress_level convert to int failed,failed str:";
+							//strcat(log_str, compress);
+							vnclog.Print(LL_INTERR, VNCLOG("compress_level convert to int failed\n"));
+							//vnclog.Print(LL_INTERR, VNCLOG(log_str));
+						}
+
+						SettingsManager* settingsIns = SettingsManager::getInstance();
+						if (settingsIns != nullptr)
+						{
+							settingsIns->setCompressLevel(compress_level);
+						}
+					}
+					i = end;
+				}
+				continue;
+			}
+
+			if (strncmp(&szCmdLine[i], winvncQualitylevel, strlen(winvncQualitylevel)) == 0)
+			{
+				i += strlen(winvncQualitylevel);
+
+				size_t start, end;
+				start = i;
+				while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+				end = start;
+				while (szCmdLine[end] > ' ') end++;
+				
+				if (end - start > 0)
+				{
+					char* quality=new char[end - start + 1];
+					if (quality != nullptr)
+					{
+						strncpy_s(quality, end - start + 1, &(szCmdLine[start]), end - start);;
+						int quality_level = 9;
+						try
+						{
+							quality_level=std::stoi(quality);
+						}
+						catch (const std::exception&)
+						{
+							//char* log_str = "compress_level convert to int failed,failed str:";
+							//strcat(log_str, compress);
+							vnclog.Print(LL_INTERR, VNCLOG("compress_level convert to int failed\n"));
+							//vnclog.Print(LL_INTERR, VNCLOG(log_str));
+						}
+
+						SettingsManager* settingsIns = SettingsManager::getInstance();
+						if (settingsIns != nullptr)
+						{
+							settingsIns->setQualityLevel(quality_level);
+						}
+					}
+					i = end;
+				}
+				continue;
+			}
+			
 
 			//adzm 2009-06-20
 			if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)

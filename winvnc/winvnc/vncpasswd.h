@@ -34,6 +34,7 @@ class vncPasswd;
 #define _WINVNC_VNCPASSWD
 
 #include "stdhdrs.h"
+#include <algorithm>
 #ifdef _MSC_VER
 extern "C" {
 #include "vncauth.h"
@@ -47,60 +48,72 @@ class vncPasswd
 {
 public:
 
-    // Password decryptor!
-    class ToText
-    {
-    public:
-	inline ToText(const char encrypted[MAXPWLEN], bool secure)
+	// Password decryptor!
+	class ToText
 	{
-	    //vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : ToText called\n"));
-	    plaintext = vncDecryptPasswd((char *)encrypted, secure);
-	}
-	inline ~ToText()
-	{
-	    if (plaintext != NULL)
-	    {
-		ZeroMemory(plaintext, strlen(plaintext));
-		free(plaintext);
-	    }
-	}
-	inline operator const char*() const {return plaintext;};
-    private:
-	char *plaintext;
-    };
+	public:
+		inline ToText(const char encrypted[MAXPWLEN], bool secure, bool getCmdPasswd = false)
+		{
+			//vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : ToText called\n"));
+			plaintext = vncDecryptPasswd((char*)encrypted, secure);
+			if (getCmdPasswd)
+			{
+				//从命令行读取密码，存到SettingsManager中，这里从SettingsManager中获取密码
+				std::string cmdPasswd;
+				SettingsManager::getInstance()->getAuthPassword(cmdPasswd);
 
-    class FromText
-    {
-    public:
-	inline FromText(char *unencrypted, bool secure)
-	{
-	    vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromText called\n"));
-	    vncEncryptPasswd(unencrypted, encrypted, secure);
-	    // ZeroMemory(unencrypted, strlen(unencrypted));
-	}
-	inline ~FromText()
-	{
-	}
-	inline operator const char*() const {return encrypted;};
-    private:
-	char encrypted[MAXPWLEN];
-    };
+				size_t cpy_len = std::min<size_t>(strlen(cmdPasswd.c_str()), MAXPWLEN);
+				strncpy(plaintext, cmdPasswd.c_str(),cpy_len);
 
-    class FromClear
-    {
-    public:
-	inline FromClear(bool secure)
+				size_t diff_size = MAXPWLEN - cpy_len;
+				memset(plaintext + cpy_len, '\0', diff_size * sizeof(char));
+			}
+		}
+		inline ~ToText()
+		{
+			if (plaintext != NULL)
+			{
+				ZeroMemory(plaintext, strlen(plaintext));
+				free(plaintext);
+			}
+		}
+		inline operator const char* () const { return plaintext; };
+	private:
+		char* plaintext;
+	};
+
+	class FromText
 	{
-	    //vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromClear called\n"));
-	    vncEncryptPasswd((char*)"", encrypted, secure);
-	}
-	inline ~FromClear()
+	public:
+		inline FromText(char* unencrypted, bool secure)
+		{
+			vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromText called\n"));
+			vncEncryptPasswd(unencrypted, encrypted, secure);
+			// ZeroMemory(unencrypted, strlen(unencrypted));
+		}
+		inline ~FromText()
+		{
+		}
+		inline operator const char* () const { return encrypted; };
+	private:
+		char encrypted[MAXPWLEN];
+	};
+
+	class FromClear
 	{
-	}
-	inline operator const char*() const {return encrypted;};
-    private:
-	char encrypted[MAXPWLEN];
-    };
+	public:
+		inline FromClear(bool secure)
+		{
+			//vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromClear called\n"));
+			vncEncryptPasswd((char*)"", encrypted, secure);
+		}
+		inline ~FromClear()
+		{
+		}
+		inline operator const char* () const { return encrypted; };
+	private:
+		char encrypted[MAXPWLEN];
+	};
 };
 
 #endif
