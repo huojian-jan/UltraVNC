@@ -225,6 +225,7 @@ bool return2(bool value)
 
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
+//init commit for yingdao_vnc
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2, int iCmdShow)
 {
 	try {
