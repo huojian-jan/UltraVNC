@@ -1048,6 +1048,14 @@ vncServer::DoNotify(UINT message, WPARAM wparam, LPARAM lparam)
 	for (i = m_notifyList.begin(); i != m_notifyList.end(); i++) {
 		PostMessage((*i), message, wparam, lparam);
 	}
+	if (message == WM_SRV_CLIENT_AUTHENTICATED)
+	{
+		writeConnnectionStatus2MMF("connected");
+	}
+	else if (message == WM_SRV_CLIENT_DISCONNECT)
+	{
+		writeConnnectionStatus2MMF("disconnected");
+	}
 }
 
 void
@@ -2138,3 +2146,49 @@ void vncServer::setVNcPort()
 	cloudThread->setVNcPort(m_port);
 #endif
 }
+
+void writeConnnectionStatus2MMF(const std::string& status)
+{
+	const size_t fileSize =status.size();
+
+	HANDLE hMapFile;
+	char* pBuf;
+
+	hMapFile = CreateFileMapping(
+		INVALID_HANDLE_VALUE,    // use paging file
+		NULL,                    // default security
+		PAGE_READWRITE,          // read/write access
+		0,                       // maximum object size (high-order DWORD)
+		fileSize,                // maximum object size (low-order DWORD)
+		g_ShadowBotSharedMMF.c_str());                 // name of mapping object
+
+	if (hMapFile == NULL)
+	{
+		_tprintf(TEXT("Could not create file mapping object (%d).\n"),
+			GetLastError());
+		//return 1;
+	}
+	pBuf = (LPTSTR)MapViewOfFile(hMapFile,   // handle to map object
+		FILE_MAP_ALL_ACCESS, // read/write permission
+		0,
+		0,
+		fileSize);
+
+	if (pBuf == NULL)
+	{
+		_tprintf(TEXT("Could not map view of file (%d).\n"),
+			GetLastError());
+
+		CloseHandle(hMapFile);
+	}
+
+
+	//CopyMemory((PVOID)pBuf, status, (_tcslen(szMsg) * sizeof(TCHAR)));
+	memcpy(pBuf, status.c_str(), fileSize);
+
+	UnmapViewOfFile(pBuf);
+
+	//CloseHandle(hMapFile);
+
+}
+
