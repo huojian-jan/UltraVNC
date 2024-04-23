@@ -1050,11 +1050,13 @@ vncServer::DoNotify(UINT message, WPARAM wparam, LPARAM lparam)
 	}
 	if (message == WM_SRV_CLIENT_AUTHENTICATED)
 	{
-		writeConnnectionStatus2MMF("connected");
+		ConnectionStatus status("connected");
+		writeConnnectionStatus2SharedFile(status);
 	}
 	else if (message == WM_SRV_CLIENT_DISCONNECT)
 	{
-		writeConnnectionStatus2MMF("disconnected");
+		ConnectionStatus status("disconnect");
+		writeConnnectionStatus2SharedFile(status);
 	}
 }
 
@@ -2147,48 +2149,22 @@ void vncServer::setVNcPort()
 #endif
 }
 
-void writeConnnectionStatus2MMF(const std::string& status)
+void writeConnnectionStatus2SharedFile(ConnectionStatus &connection)
 {
-	const size_t fileSize =status.size();
 
-	HANDLE hMapFile;
-	char* pBuf;
+	std::string connection_txt;
+	connection.ToJson(connection_txt);
 
-	hMapFile = CreateFileMapping(
-		INVALID_HANDLE_VALUE,    // use paging file
-		NULL,                    // default security
-		PAGE_READWRITE,          // read/write access
-		0,                       // maximum object size (high-order DWORD)
-		fileSize,                // maximum object size (low-order DWORD)
-		g_ShadowBotSharedMMF.c_str());                 // name of mapping object
+	char current_path[MAX_PATH];
+	GetCurrentDirectoryA(MAX_PATH, current_path);
 
-	if (hMapFile == NULL)
+	std::string filePath = current_path + g_ShadowBotSharedMMF;
+
+	std::ofstream outputFile(filePath);
+	if (outputFile.is_open())
 	{
-		_tprintf(TEXT("Could not create file mapping object (%d).\n"),
-			GetLastError());
-		//return 1;
+		outputFile << connection_txt;
+		outputFile.close();
 	}
-	pBuf = (LPTSTR)MapViewOfFile(hMapFile,   // handle to map object
-		FILE_MAP_ALL_ACCESS, // read/write permission
-		0,
-		0,
-		fileSize);
-
-	if (pBuf == NULL)
-	{
-		_tprintf(TEXT("Could not map view of file (%d).\n"),
-			GetLastError());
-
-		CloseHandle(hMapFile);
-	}
-
-
-	//CopyMemory((PVOID)pBuf, status, (_tcslen(szMsg) * sizeof(TCHAR)));
-	memcpy(pBuf, status.c_str(), fileSize);
-
-	UnmapViewOfFile(pBuf);
-
-	//CloseHandle(hMapFile);
-
 }
 
