@@ -376,7 +376,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		size_t i;
 		for (i = 0; i < strlen(szCmdLine); i++)
 		{
-			szCmdLine[i] = tolower(szCmdLine[i]);
+			szCmdLine[i] = szCmdLine[i];
 		}
 		BOOL argfound = FALSE;
 		for (i = 0; i < strlen(szCmdLine); i++)
