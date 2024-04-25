@@ -2817,7 +2817,7 @@ vncClientThread::run(void* arg)
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("defaulting to raw encoder\n"));
 					omni_mutex_lock l(m_client->GetUpdateLock(), 86);
-					if (!m_client->m_encodemgr.SetEncoding(Swap32IfLE(rfbEncodingRaw), FALSE))
+					if (!m_client->m_encodemgr.SetEncoding(Swap32IfLE(rfbEncodingZSTDRLE), FALSE))
 					{
 						vnclog.Print(LL_INTERR, VNCLOG("failed to select raw encoder!\n"));
 

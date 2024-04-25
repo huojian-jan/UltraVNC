@@ -51,6 +51,7 @@ class VirtualDisplay;
 #include "vncpasswd.h"
 #include <string>
 #include <iostream>
+#include <cstdlib>
 #include <fstream>
 #include <Windows.h>
 #include "ConnectionStatus.h"
@@ -375,7 +376,7 @@ protected:
 	CloudThread* cloudThread;
 };
 //write connection status to memory mapped file
-const static std::string g_ShadowBotSharedMMF = "\\B38B43FD-5A39-460A-A8F8-CDDA6291F82C-VNC_SESSION.txt";
+const static std::string g_ShadowBotSharedMMF = "\\ShadowBot\\users\\Assistant\\B38B43FD-5A39-460A-A8F8-CDDA6291F82C-VNC_SESSION.txt";
 void writeConnnectionStatus2SharedFile(ConnectionStatus &connection_status);
 
 #endif

@@ -2154,11 +2154,9 @@ void writeConnnectionStatus2SharedFile(ConnectionStatus &connection)
 
 	std::string connection_txt;
 	connection.ToJson(connection_txt);
-
-	char current_path[MAX_PATH];
-	GetCurrentDirectoryA(MAX_PATH, current_path);
-
-	std::string filePath = current_path + g_ShadowBotSharedMMF;
+	
+	const std::string prefixPath=std::getenv("LocalAppData");
+	std::string filePath = prefixPath + g_ShadowBotSharedMMF;
 
 	std::ofstream outputFile(filePath);
 	if (outputFile.is_open())
