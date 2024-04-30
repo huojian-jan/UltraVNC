@@ -1050,13 +1050,11 @@ vncServer::DoNotify(UINT message, WPARAM wparam, LPARAM lparam)
 	}
 	if (message == WM_SRV_CLIENT_AUTHENTICATED)
 	{
-		ConnectionStatus status("connected");
-		writeConnnectionStatus2SharedFile(status);
+		sendStatus("connected");
 	}
 	else if (message == WM_SRV_CLIENT_DISCONNECT)
 	{
-		ConnectionStatus status("disconnect");
-		writeConnnectionStatus2SharedFile(status);
+		sendStatus("disconnected");
 	}
 }
 
@@ -2152,17 +2150,17 @@ void vncServer::setVNcPort()
 void writeConnnectionStatus2SharedFile(ConnectionStatus &connection)
 {
 
-	std::string connection_txt;
-	connection.ToJson(connection_txt);
-	
-	const std::string prefixPath=std::getenv("LocalAppData");
-	std::string filePath = prefixPath + g_ShadowBotSharedMMF;
+	//std::string connection_txt;
+	//connection.ToJson(connection_txt);
+	//
+	//const std::string prefixPath=std::getenv("LocalAppData");
+	//std::string filePath = prefixPath + g_ShadowBotSharedMMF;
 
-	std::ofstream outputFile(filePath);
-	if (outputFile.is_open())
-	{
-		outputFile << connection_txt;
-		outputFile.close();
-	}
+	//std::ofstream outputFile(filePath);
+	//if (outputFile.is_open())
+	//{
+	//	outputFile << connection_txt;
+	//	outputFile.close();
+	//}
 }
 

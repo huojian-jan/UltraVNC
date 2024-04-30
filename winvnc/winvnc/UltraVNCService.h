@@ -1,6 +1,7 @@
 #pragma once
 #ifndef SC_20
 #define MAXSTRLENGTH    255
+#include "ShadowBotVNC.h"
 
 typedef struct _CPAU_PARAM {
 	DWORD   cbSize;

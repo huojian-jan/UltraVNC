@@ -8,14 +8,11 @@ using json = nlohmann::json;
  class ConnectionStatus
 {
 public:
-	ConnectionStatus(std::string);
+	ConnectionStatus(std::string,int);
 	~ConnectionStatus();
 
 public:
-	void ToJson(std::string &status_txt);
-
-	public:
-		std::string m_status;
-	
+	std::string m_status;
+	int m_processId;
 };
 
