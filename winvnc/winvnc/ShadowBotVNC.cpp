@@ -10,8 +10,10 @@ VNC_Command::~VNC_Command()
 }
 
 VNC_Command* m_currentVNCCommand;
- HANDLE m_serverPipeHandle;
- HANDLE m_servicePipeHandle;
+HANDLE m_serverPipeHandle;
+HANDLE m_servicePipeHandle;
+OVERLAPPED overlapped;
+
 void connect2ShadowBot()
 {
 	std::string pipeName = "\\\\.\\pipe\\" + g_VNC_Server_Pipe;
@@ -28,6 +30,8 @@ void connect2ShadowBot()
 			NULL
 		);
 	}
+
+
 	//if (m_serverPipeHandle == INVALID_HANDLE_VALUE)
 	//{
 	//	write_log("uvnc_server pipe create failed");
@@ -57,7 +61,6 @@ void setupServicePipe()
 	sa.lpSecurityDescriptor = pSD;
 	sa.bInheritHandle = TRUE;
 
-
 	m_servicePipeHandle = CreateNamedPipe(
 		pipeName.c_str(),
 		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
@@ -74,17 +77,85 @@ void setupServicePipe()
 		return;
 	}
 
-	BOOL result = ConnectNamedPipe(m_servicePipeHandle, NULL);
-
-	if (result)
+	while (true)
 	{
-		std::cout << "Client connected." << std::endl;
-
-		// 读取客户端数据
-
+		write_log("waiting ccommand");
+		ConnectNamedPipe(m_servicePipeHandle, NULL);
 		read_pipe_command();
-		int a = 100;
+		DisconnectNamedPipe(m_servicePipeHandle);
+		//write_log("waiting in new old pipe");
+		//Sleep(1000);
 	}
+
+	//BOOL result = ConnectNamedPipe(m_servicePipeHandle,&overlapped);
+
+	//if (result)
+	//{
+	//	std::cout << "Client connected." << std::endl;
+
+	//	// 读取客户端数据
+
+	//	read_pipe_command();
+	//	int a = 100;
+	//}
+}
+
+void setupServicePipe_New()
+{
+	OVERLAPPED overlapped;
+	// 创建一个允许非管理员权限进程连接的管道
+	PSECURITY_DESCRIPTOR pSD = NULL;
+	SECURITY_ATTRIBUTES sa;
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+	if (!ConvertStringSecurityDescriptorToSecurityDescriptor(
+		"D:P(A;;GA;;;WD)",  // 以字符串形式指定的安全描述符（允许任何用户组连接）
+		SDDL_REVISION_1,
+		&pSD,
+		NULL))
+	{
+		std::cout << "Failed to convert security descriptor. Error code: " << GetLastError() << std::endl;
+		return;
+	}
+
+	sa.lpSecurityDescriptor = pSD;
+	sa.bInheritHandle = TRUE;
+
+
+	// 创建命名管道
+	m_servicePipeHandle = CreateNamedPipe(
+		"\\\\.\\pipe\\MyPipe", // 管道名称
+		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, // 管道访问模式
+		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, // 管道类型和读取模式
+		1, // 最大实例数
+		4096, // 输出缓冲区大小
+		4096, // 输入缓冲区大小
+		0, // 默认超时时间
+		&sa // 安全属性
+	);
+
+	if (m_servicePipeHandle == INVALID_HANDLE_VALUE) {
+		//std::cout << "Failed to create named pipe. Error code: " << GetLastError() << std::endl;
+		std::string msg = "Failed to create named pipe. Error code: "+GetLastError();
+		write_log(msg);
+		return;
+	}
+
+
+	// 异步等待客户端连接
+	while (true)
+	{
+		write_log("waiting for command");
+		ConnectNamedPipe(m_servicePipeHandle,NULL);
+		
+		
+		read_pipe_command();
+		write_log("received command:");
+		write_log("cmd:" + m_currentVNCCommand->command + "\targs:" + m_currentVNCCommand->args + "\tid:" + m_currentVNCCommand->userId);
+		DisconnectNamedPipe(m_servicePipeHandle);
+	}
+
+	
 }
 
 void sendStatus(const std::string status)
@@ -145,6 +216,10 @@ void read_pipe_command()
 	m_currentVNCCommand->userId = commandJson.at("userId");
 }
 
+void waiting_for_command()
+{
+}
+
 void get_command_length(char* buffer, int& length)
 {
 	std::string commandLenStr;
@@ -162,6 +237,43 @@ void get_command_length(char* buffer, int& length)
 		write_log(ex.what());
 	}
 }
+
+VOID CALLBACK CompletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
+{
+	if (dwErrorCode == 0 && dwNumberOfBytesTransfered > 0)
+	{
+		// 处理接收到的数据
+		CHAR buffer[1024];
+		memcpy(buffer, lpOverlapped->Pointer, dwNumberOfBytesTransfered);
+
+		int commandLength = -1;
+		get_command_length(buffer, commandLength);
+
+		if (commandLength == -1)
+		{
+			write_log("read data error,command length get -1");
+			return;
+		}
+
+		std::string cmd;
+		for (int i = COMMAND_LENGTH; i < COMMAND_LENGTH + commandLength; i++)
+		{
+			cmd += buffer[i];
+		}
+
+		auto commandJson = json::parse(cmd);
+
+		m_currentVNCCommand->command = commandJson.at("command");
+		m_currentVNCCommand->args = commandJson.at("arguments");
+		m_currentVNCCommand->userId = commandJson.at("userId");
+
+		// 继续等待客户端写入数据
+		ReadFileEx(m_servicePipeHandle, buffer, sizeof(buffer), lpOverlapped, CompletionRoutine);
+
+		write_log("data received==============================================");
+	}
+}
+
 
 
 void write_log(const std::string& info)

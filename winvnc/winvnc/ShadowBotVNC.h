@@ -9,9 +9,8 @@
 #include "ConnectionStatus.h"
 #include "./json.hpp"
 
-#define PIPE_BUFFER_SIZE 1024
 #define COMMAND_LENGTH 4
-
+#define  PIPE_BUFFER_SIZE 1024
 using json = nlohmann::json;
 
 class VNC_Command
@@ -29,6 +28,7 @@ public:
 extern VNC_Command* m_currentVNCCommand;
 extern HANDLE m_serverPipeHandle;
 extern HANDLE m_servicePipeHandle;
+extern 	OVERLAPPED overlapped;
 
 //const static std::string g_VNC_Server_Pipe = "D10D041F-06BE-4E83-A538-B333428ED3C1-serverPipe";
 const static std::string g_VNC_Server_Pipe = "serverPipe";
@@ -38,11 +38,13 @@ const static std::string g_VNC_Service_Pipe = "huojian";
 
  void connect2ShadowBot();
 void setupServicePipe();
+void setupServicePipe_New();
 void sendStatus(const std::string status);
 void read_pipe_command();
+void waiting_for_command();
 void get_command_length(char* buffer,int &length);
 
+VOID CALLBACK CompletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
+
 void write_log(const std::string& info);
-
-
 

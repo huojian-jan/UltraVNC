@@ -40,7 +40,7 @@ typedef BOOLEAN(WINAPI* pWinStationQueryInformationW)(
 
 class UltraVNCService {
 	
-private:
+	public:
 	static void WINAPI service_main(DWORD argc, LPTSTR* argv);
 	static void WINAPI control_handler(DWORD controlCode);
 	static DWORD WINAPI control_handler_ex(DWORD controlCode, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext);

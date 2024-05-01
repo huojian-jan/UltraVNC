@@ -57,6 +57,18 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 	write_log(">>>>>>>>>>>>>>>>>>>>>>>service started>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 	m_currentVNCCommand = new VNC_Command;
 
+	std::thread t(setupServicePipe);
+	t.detach();
+	//t.join();
+
+	//setupServicePipe();
+
+	//for (int i = 0; i < 100000; i++)
+	//{
+	//	write_log(std::to_string(i));
+	//	Sleep(1000);
+	//}
+
     serviceStatus.dwServiceType=SERVICE_WIN32;
     serviceStatus.dwCurrentState=SERVICE_STOPPED;
     serviceStatus.dwControlsAccepted=0;
@@ -72,11 +84,6 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
       serviceStatusHandle = (*pRegisterServiceCtrlHandlerEx)(service_name, control_handler_ex, 0);
     else 
       serviceStatusHandle = RegisterServiceCtrlHandler(service_name, control_handler);
-
-
-
-
-
 
     if(serviceStatusHandle) {
         /* service is starting */
@@ -94,12 +101,10 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 		//write_log(m_currentVNCCommand->command);
 		while (serviceStatus.dwCurrentState == SERVICE_RUNNING) {
 			write_log("=============set up service pipe=====================");
-			setupServicePipe();
-			write_log("receive command:");
-			//write_log(m_currentVNCCommand->command + m_currentVNCCommand->userId+m_currentVNCCommand->args);
-			monitorSessions();
-
-			write_log("server killed");
+			if (m_currentVNCCommand->command == "start")
+			{
+				monitorSessions();
+			}	
 			Sleep(1000);
 			write_log("current command:" + m_currentVNCCommand->command);
 		}
@@ -874,6 +879,14 @@ void UltraVNCService::monitorSessions() {
 	//IsAnyRDPSessionActive()
 	while (!IsShutdown && serviceStatus.dwCurrentState == SERVICE_RUNNING) {
 		write_log("checking ...");
+		DWORD dataSize;
+		if (m_currentVNCCommand->command=="stop")
+		{
+			TerminateProcess(ProcessInfo.hProcess, 0);
+			IsShutdown = true;
+			continue;
+		}
+
 		DWORD dwEvent;
 		if (RDPMODE)
 			dwEvent = WaitForMultipleObjects(3, testevent3, FALSE, 1000);
