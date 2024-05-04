@@ -59,15 +59,6 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 
 	std::thread t(setupServicePipe);
 	t.detach();
-	//t.join();
-
-	//setupServicePipe();
-
-	//for (int i = 0; i < 100000; i++)
-	//{
-	//	write_log(std::to_string(i));
-	//	Sleep(1000);
-	//}
 
     serviceStatus.dwServiceType=SERVICE_WIN32;
     serviceStatus.dwCurrentState=SERVICE_STOPPED;
@@ -101,11 +92,16 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 		//write_log(m_currentVNCCommand->command);
 		while (serviceStatus.dwCurrentState == SERVICE_RUNNING) {
 			write_log("=============set up service pipe=====================");
+			{
+				std::unique_lock<std::mutex> lock(cmd_mtx);
+				cmd_cond_vr.wait(lock);
+			}
+
 			if (m_currentVNCCommand->command == "start")
 			{
 				monitorSessions();
 			}	
-			Sleep(1000);
+			//Sleep(1000);
 			write_log("current command:" + m_currentVNCCommand->command);
 		}
 
@@ -820,11 +816,9 @@ int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 	kickrdp = myIniFile.ReadInt("admin", "kickrdp", kickrdp);
 	clear_console = myIniFile.ReadInt("admin", "clearconsole", clear_console);
 	myIniFile.ReadString("admin", "service_commandline", cmdline, 256);
-	//write_log("before cmd:");
-	//write_log(cmdline);
+
 	strcpy(cmdline, m_currentVNCCommand->args.c_str());
-	//write_log("after cmd:");
-	//write_log(cmdline);
+	
 	if (strlen(cmdline) != 0) {
 		strcpy_s(app_path, exe_file_name);
 		if (preconnect)
