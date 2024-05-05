@@ -1219,6 +1219,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			}
 			
 
+			if (strncmp(&szCmdLine[i], commandLineEncoder, strlen(commandLineEncoder)) == 0)
+			{
+				i += strlen(commandLineEncoder);
+
+				size_t start, end;
+				start = i;
+				while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+				end = start;
+				while (szCmdLine[end] > ' ') end++;
+
+				if (end - start > 0)
+				{
+					char* encoder = new char[end - start + 1];
+					if (encoder != nullptr)
+					{
+						strncpy_s(encoder, end - start + 1, &(szCmdLine[start]), end - start);;
+						SettingsManager* settingsIns = SettingsManager::getInstance();
+						if (settingsIns != nullptr)
+						{
+							settingsIns->setEncoder(encoder);
+						}
+					}
+					i = end;
+				}
+				continue;
+			}
+
 			//adzm 2009-06-20
 			if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)
 			{

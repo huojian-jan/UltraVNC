@@ -479,6 +479,11 @@ SettingsManager::setQualityLevel(const int value)
 	m_pref_QualityLevel = value;
 }
 
+void SettingsManager::setEncoder(const std::string& value)
+{
+	m_encoder = value;
+}
+
 void
 SettingsManager::getAuthPassword(std::string &value)
 {
@@ -495,5 +500,90 @@ void
 SettingsManager::getQualityLevel(int& value)
 {
 	value = m_pref_QualityLevel;
+}
+
+void SettingsManager::getEncoder(int &encoder)
+{
+	if (m_encoder == "rfbEncodingRaw")
+	{
+		encoder = rfbEncodingRaw;
+	}
+	else if (m_encoder == "rfbEncodingCopyRect")
+	{
+		encoder = rfbEncodingCopyRect;
+	}
+	else if (m_encoder == "rfbEncodingRRE")
+	{
+		encoder = rfbEncodingRRE;
+	}
+	else if (m_encoder == "rfbEncodingCoRRE")
+	{
+		encoder = rfbEncodingCoRRE;
+	}
+	else if (m_encoder == "rfbEncodingHextile")
+	{
+		encoder = rfbEncodingHextile;
+	}
+	else if (m_encoder == "rfbEncodingZlib")
+	{
+		encoder = rfbEncodingZlib;
+	}
+	else if (m_encoder == "rfbEncodingTight")
+	{
+		encoder = rfbEncodingTight;
+	}
+	else if (m_encoder == "rfbEncodingZlibHex")
+	{
+		encoder = rfbEncodingZlibHex;
+	}
+	else if (m_encoder == "rfbEncodingUltra")
+	{
+		encoder = rfbEncodingUltra;
+	}
+	else if (m_encoder == "rfbEncodingUltra2")
+	{
+		encoder = rfbEncodingUltra2;
+	}
+	else if (m_encoder == "rfbEncodingZRLE")
+	{
+		encoder = rfbEncodingZRLE;
+	}
+	else if (m_encoder == "rfbEncodingZYWRLE")
+	{
+		encoder = rfbEncodingZYWRLE;
+	}
+	else if (m_encoder == "rfbEncodingXZ")
+	{
+		encoder = rfbEncodingXZ;
+	}
+	else if (m_encoder == "rfbEncodingXZYW")
+	{
+		encoder = rfbEncodingXZYW;
+	}
+	else if (m_encoder == "rfbEncodingZstd")
+	{
+		encoder = rfbEncodingZstd;
+	}
+	else if (m_encoder == "rfbEncodingTightZstd")
+	{
+		encoder = rfbEncodingTightZstd;
+	}
+	else if (m_encoder == "rfbEncodingZstdHex")
+	{
+		encoder = rfbEncodingZstdHex;
+	}
+	else if (m_encoder == "rfbEncodingZSTDRLE")
+	{
+		encoder = rfbEncodingZSTDRLE;
+	}
+	else if (m_encoder == "rfbEncodingZSTDYWRLE")
+	{
+		encoder = rfbEncodingZSTDYWRLE;
+	}
+	else
+	{
+		//非法的编码器，用默认编码器
+		encoder = rfbEncodingRaw;
+	}
 }
 

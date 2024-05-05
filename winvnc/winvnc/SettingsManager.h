@@ -3,6 +3,7 @@
 #include <string>
 #include "inifile.h"
 #include "rfb.h"
+#include "rfb/rfbproto.h"
 
 #define MAXPWLEN 8
 #define MAXMSPWLEN 32
@@ -233,11 +234,12 @@ public:
 	void setAuthPassword(const std::string&);
 	void setCompressLevel(const int value);
 	void setQualityLevel(const int value);
+	void setEncoder(const std::string &value);
 
 	void getAuthPassword(std::string&);
 	void getCompressLevel(int&);
 	void getQualityLevel(int&);
-	
+	void getEncoder(int &encoder);
 
 #ifdef IPV6V4
 	// Whether or not to allow connections from the local machine
@@ -362,6 +364,7 @@ private:
 	std::string m_auth_password;
 	int m_pref_CompressLevel;
 	int m_pref_QualityLevel;
+	std::string m_encoder;
 };
 
 extern SettingsManager* settings;

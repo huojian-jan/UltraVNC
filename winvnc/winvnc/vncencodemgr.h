@@ -375,9 +375,14 @@ vncEncodeMgr::CheckBuffer()
 		m_clientformat = m_scrinfo.format;
 	}
 
+	int encoder = rfbEncodingRaw;
+	SettingsManager *settingsIns=SettingsManager::getInstance();
+	if (settingsIns != nullptr)
+	{
+		settingsIns->getEncoder(encoder);
+	}
 	// If the client has not selected an encoding then set one for it
 	if ((m_encoder == NULL) && (!SetEncoding(rfbEncodingRaw, FALSE)))
-	//if ((m_encoder == NULL) && (!SetEncoding(rfbEncodingZSTDRLE, FALSE)))
 		return FALSE;
 
 	// Check the client buffer is sufficient

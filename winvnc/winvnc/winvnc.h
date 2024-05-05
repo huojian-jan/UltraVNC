@@ -73,6 +73,7 @@ const char winvnchttp[]	= "-httpproxy";
 const char winvncAuth[] = "-auth";
 const char winvncCompressLevel[] = "-compress";
 const char winvncQualitylevel[] = "-quality";
+const char commandLineEncoder[] = "encoder";
 
 //adzm 2009-06-20
 // for use with -sc
