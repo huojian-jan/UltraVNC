@@ -72,7 +72,7 @@ void setupServicePipe()
 
 	while (true)
 	{
-		write_log("waiting for command...");
+		write_log("waiting for command...from child thread");
 
 		ConnectNamedPipe(m_servicePipeHandle, NULL);
 		read_pipe_command();
@@ -148,7 +148,7 @@ void read_pipe_command()
 		m_currentVNCCommand->args = commandJson.at("arguments");
 		m_currentVNCCommand->userId = commandJson.at("userId");
 		
-		cmd_cond_vr.notify_one();
+		cmd_cond_vr.notify_all();
 	}
 }
 

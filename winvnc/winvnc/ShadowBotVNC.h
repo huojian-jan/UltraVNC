@@ -33,10 +33,10 @@ extern HANDLE m_servicePipeHandle;
 extern std::mutex cmd_mtx;
 extern std::condition_variable cmd_cond_vr;
 
-//const static std::string g_VNC_Server_Pipe = "D10D041F-06BE-4E83-A538-B333428ED3C1-serverPipe";
-const static std::string g_VNC_Server_Pipe = "serverPipe";
-//const static std::string g_VNC_Service_Pipe = "33F9112E-CEB4-4407-842A-385BD7232CA1-servicePipe";
-const static std::string g_VNC_Service_Pipe = "huojian";
+const static std::string g_VNC_Server_Pipe = "D10D041F-06BE-4E83-A538-B333428ED3C1-serverPipe";
+//const static std::string g_VNC_Server_Pipe = "serverPipe";
+const static std::string g_VNC_Service_Pipe = "33F9112E-CEB4-4407-842A-385BD7232CA1-servicePipe";
+//const static std::string g_VNC_Service_Pipe = "huojian";
 
 
 void connect2ShadowBot();
