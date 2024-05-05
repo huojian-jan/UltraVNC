@@ -20,8 +20,7 @@ void connect2ShadowBot()
 {
 	std::string pipeName = "\\\\.\\pipe\\" + g_VNC_Server_Pipe;
 
-	if (m_serverPipeHandle == nullptr)
-	{
+
 		m_serverPipeHandle = CreateFile(
 			pipeName.c_str(),
 			GENERIC_READ | GENERIC_WRITE,
@@ -31,7 +30,6 @@ void connect2ShadowBot()
 			0,
 			NULL
 		);
-	}
 }
 
 void setupServicePipe()
@@ -111,6 +109,8 @@ void sendStatus(const std::string status)
 	}
 
 	write_log("status:" + status + "send successfully");
+
+	DisconnectNamedPipe(m_serverPipeHandle);
 }
 
 void read_pipe_command()

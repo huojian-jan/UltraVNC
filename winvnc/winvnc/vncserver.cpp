@@ -1050,7 +1050,11 @@ vncServer::DoNotify(UINT message, WPARAM wparam, LPARAM lparam)
 	}
 	if (message == WM_SRV_CLIENT_AUTHENTICATED)
 	{
-		sendStatus("connected");
+		//for (int i = 0; i < 10000; i++)
+		//{
+		//	Sleep(100);
+		//}
+			sendStatus("connected");
 	}
 	else if (message == WM_SRV_CLIENT_DISCONNECT)
 	{

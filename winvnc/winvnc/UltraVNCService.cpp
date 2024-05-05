@@ -97,10 +97,18 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 				cmd_cond_vr.wait(lock);
 			}
 
-			if (m_currentVNCCommand->command == "start")
+			if (m_currentVNCCommand->command == "stop")
+			{
+				TerminateProcess(ProcessInfo.hProcess, 0);
+			}
+			else if (m_currentVNCCommand->command == "start")
 			{
 				monitorSessions();
-			}	
+			}
+			else
+			{
+				write_log("invalid command:" + m_currentVNCCommand->command);
+			}
 			//Sleep(1000);
 			write_log("current command:" + m_currentVNCCommand->command);
 		}
