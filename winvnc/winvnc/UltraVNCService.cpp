@@ -54,11 +54,6 @@ UltraVNCService::UltraVNCService()
 ////////////////////////////////////////////////////////////////////////////////
 void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
     /* initialise service status */
-	write_log(">>>>>>>>>>>>>>>>>>>>>>>service started>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-	m_currentVNCCommand = new VNC_Command;
-
-	std::thread t(setupServicePipe);
-	t.detach();
 
     serviceStatus.dwServiceType=SERVICE_WIN32;
     serviceStatus.dwCurrentState=SERVICE_STOPPED;
@@ -91,29 +86,8 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 		Restore_after_reboot();
 		//write_log(m_currentVNCCommand->command);
 		while (serviceStatus.dwCurrentState == SERVICE_RUNNING) {
-			write_log("=============set up service pipe=====================");
-			{
-				std::unique_lock<std::mutex> lock(cmd_mtx);
-				cmd_cond_vr.wait(lock);
-			}
-
-			if (m_currentVNCCommand->command == "stop")
-			{
-				TerminateProcess(ProcessInfo.hProcess, 0);
-			}
-			else if (m_currentVNCCommand->command == "start")
-			{
 				monitorSessions();
-			}
-			else
-			{
-				write_log("invalid command:" + m_currentVNCCommand->command);
-			}
-			//Sleep(1000);
-			write_log("current command:" + m_currentVNCCommand->command);
 		}
-
-
         /* service was stopped */
         serviceStatus.dwCurrentState=SERVICE_STOP_PENDING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
@@ -125,6 +99,7 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
     }
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 void WINAPI UltraVNCService::control_handler(DWORD controlCode)
 {
