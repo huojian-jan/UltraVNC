@@ -54,8 +54,6 @@ class VirtualDisplay;
 #include <cstdlib>
 #include <fstream>
 #include <Windows.h>
-#include "ConnectionStatus.h"
-#include "ShadowBotVNC.h"
 // Includes
 #include "stdhdrs.h"
 #include <omnithread.h>
@@ -63,6 +61,7 @@ class VirtualDisplay;
 
 // adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
+#include "ShadowBotVNC.h"
 
 // Define a datatype to handle lists of windows we wish to notify
 typedef std::list<HWND> vncNotifyList;
@@ -376,6 +375,4 @@ protected:
 	BOOL sethook;
 	CloudThread* cloudThread;
 };
-//write connection status to memory mapped file
-
 #endif

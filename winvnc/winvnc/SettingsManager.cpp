@@ -484,6 +484,11 @@ void SettingsManager::setEncoder(const std::string& value)
 	m_encoder = value;
 }
 
+void SettingsManager::setLogFile(const std::string& value)
+{
+	m_logFile = value;
+}
+
 void
 SettingsManager::getAuthPassword(std::string &value)
 {
@@ -585,5 +590,10 @@ void SettingsManager::getEncoder(int &encoder)
 		//非法的编码器，用默认编码器
 		encoder = rfbEncodingRaw;
 	}
+}
+
+void SettingsManager::getLogFile(std::string& logFile)
+{
+	logFile = m_logFile;
 }
 

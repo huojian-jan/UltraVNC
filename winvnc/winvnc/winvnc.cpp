@@ -1246,6 +1246,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				continue;
 			}
 
+			if (strncmp(&szCmdLine[i], logFile, strlen(logFile)) == 0)
+			{
+				i += strlen(logFile);
+
+				size_t start, end;
+				start = i;
+				while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+				end = start;
+				while (szCmdLine[end] > ' ') end++;
+
+				if (end - start > 0)
+				{
+					char* log = new char[end - start + 1];
+					if (log != nullptr)
+					{
+						strncpy_s(log, end - start + 1, &(szCmdLine[start]), end - start);;
+						SettingsManager* settingsIns = SettingsManager::getInstance();
+						if (settingsIns != nullptr)
+						{
+							settingsIns->setLogFile(log);
+						}
+					}
+					i = end;
+				}
+				continue;
+			}
+
 			//adzm 2009-06-20
 			if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)
 			{

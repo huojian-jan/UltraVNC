@@ -1,4 +1,5 @@
 #pragma once
+
 #include "stdhdrs.h"
 #include <string>
 #include "inifile.h"
@@ -235,11 +236,13 @@ public:
 	void setCompressLevel(const int value);
 	void setQualityLevel(const int value);
 	void setEncoder(const std::string &value);
+	void setLogFile(const std::string& value);
 
 	void getAuthPassword(std::string&);
 	void getCompressLevel(int&);
 	void getQualityLevel(int&);
 	void getEncoder(int &encoder);
+	void getLogFile(std::string& logFile);
 
 #ifdef IPV6V4
 	// Whether or not to allow connections from the local machine
@@ -365,6 +368,7 @@ private:
 	int m_pref_CompressLevel;
 	int m_pref_QualityLevel;
 	std::string m_encoder;
+	std::string m_logFile;
 };
 
 extern SettingsManager* settings;

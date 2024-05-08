@@ -87,7 +87,7 @@
     <ClCompile Include="SettingsManager.cpp" />
     <ClCompile Include="CloudDialog.cpp" />
     <ClCompile Include="..\..\common\d3des.c" />
-    <ClCompile Include="ConnectionStatus.cpp" />
+    <ClCompile Include="VNCConnection.cpp" />
     <ClCompile Include="ShadowBotVNC.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -317,11 +317,13 @@
     <ClInclude Include="..\..\common\d3des.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectionStatus.h" />
     <ClInclude Include="json.hpp">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="ShadowBotVNC.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="VNCConnection.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

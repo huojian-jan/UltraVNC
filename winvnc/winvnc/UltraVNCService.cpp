@@ -800,8 +800,6 @@ int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 	clear_console = myIniFile.ReadInt("admin", "clearconsole", clear_console);
 	myIniFile.ReadString("admin", "service_commandline", cmdline, 256);
 
-	strcpy(cmdline, m_currentVNCCommand->args.c_str());
-	
 	if (strlen(cmdline) != 0) {
 		strcpy_s(app_path, exe_file_name);
 		if (preconnect)
@@ -855,14 +853,7 @@ void UltraVNCService::monitorSessions() {
 
 	//IsAnyRDPSessionActive()
 	while (!IsShutdown && serviceStatus.dwCurrentState == SERVICE_RUNNING) {
-		write_log("checking ...");
 		DWORD dataSize;
-		if (m_currentVNCCommand->command=="stop")
-		{
-			TerminateProcess(ProcessInfo.hProcess, 0);
-			IsShutdown = true;
-			continue;
-		}
 
 		DWORD dwEvent;
 		if (RDPMODE)
@@ -879,7 +870,6 @@ void UltraVNCService::monitorSessions() {
 			// We get some preconnect session selection input
 		case WAIT_OBJECT_0 + 2:
 		{
-			write_log("2");
 			//Tell winvnc to stop
 			SetEvent(hEvent);
 			requestedSessionID = *a;
@@ -912,14 +902,12 @@ void UltraVNCService::monitorSessions() {
 
 		//stopServiceEvent, exit while loop
 		case WAIT_OBJECT_0 + 0:
-			write_log("0");
 			IsShutdown = true;
 			break;
 
 			//cad request
 		case WAIT_OBJECT_0 + 1:
 		{
-			write_log("1");
 			typedef VOID(WINAPI* SendSas)(BOOL asUser);
 			HINSTANCE Inst = LoadLibrary("sas.dll");
 			SendSas sendSas = (SendSas)GetProcAddress(Inst, "SendSAS");
@@ -957,10 +945,8 @@ void UltraVNCService::monitorSessions() {
 					}
 					else {
 						dwSessionId = 0xFFFFFFFF;
-						write_log("0xFFFFFFFF");
 						int sessidcounter = 0;
 						while (dwSessionId == 0xFFFFFFFF && !IsShutdown) {
-							write_log("inner while loop");
 							dwSessionId = WTSGetActiveConsoleSessionId();
 							Sleep(1000);
 							sessidcounter++;
@@ -986,12 +972,10 @@ void UltraVNCService::monitorSessions() {
 					ProcessInfo.hProcess = NULL;
 					ProcessInfo.hThread = NULL;
 					RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
-					write_log("in exit code");
 					Sleep(1000);
 					goto whileloop;
 				}
 
-				write_log("before still alive ");
 				if (dwCode == STILL_ACTIVE)
 					goto whileloop;
 				if (ProcessInfo.hProcess)
@@ -1008,25 +992,20 @@ void UltraVNCService::monitorSessions() {
 			}//timeout
 			else
 			{
-				//write_log("WTSGetActiveConsoleSessionId");
 					dwSessionId = WTSGetActiveConsoleSessionId();
-					//write_log(std::to_string(dwSessionId));
 					if (OlddwSessionId != dwSessionId)
 					{
 						SetEvent(hEvent);
-						write_log("old not equal dwSessionId");
 					}
 				if (dwSessionId != 0xFFFFFFFF) {
 					DWORD dwCode = 0;
 					if (ProcessInfo.hProcess == NULL) {
 						//First RUNf
-							write_log("may be first run");
 						LaunchProcessWin(dwSessionId, false, false);
 						OlddwSessionId = dwSessionId;
 					}
 					else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode)) {
 						if (dwCode != STILL_ACTIVE) {
-							write_log("vnc server exited");
 							IsShutdown = true;
 							WaitForSingleObject(ProcessInfo.hProcess, 15000);
 							if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
@@ -1036,7 +1015,6 @@ void UltraVNCService::monitorSessions() {
 							int sessidcounter = 0;
 							while (dwSessionId == 0xFFFFFFFF && !IsShutdown) {
 								Sleep(1000);
-								write_log("vnc server restarted-------------------");
 								dwSessionId = WTSGetActiveConsoleSessionId();
 								sessidcounter++;
 								if (sessidcounter > 10) break;
@@ -1046,7 +1024,6 @@ void UltraVNCService::monitorSessions() {
 						}
 					}
 					else {
-						write_log("vnc server running fine......................");
 						if (ProcessInfo.hProcess)
 							CloseHandle(ProcessInfo.hProcess);
 						if (ProcessInfo.hThread)
