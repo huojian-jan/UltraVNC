@@ -158,7 +158,7 @@ Myinit(HINSTANCE hInstance)
 
     //Load all messages from ressource file
     Load_Localization(hInstResDLL) ;
-	vnclog.SetFile();
+	//vnclog.SetFile();
 	//vnclog.SetMode(4);
 	//vnclog.SetLevel(10);
 
@@ -334,7 +334,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		char progname[MAX_PATH];
 		strncpy_s(progname, WORKDIR, sizeof progname);
 		progname[MAX_PATH - 1] = 0;
-		vnclog.SetFile();
+		//vnclog.SetFile();
 
 
 	#ifdef _DEBUG
@@ -802,6 +802,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			{
 				// WinVNC is being run as a user-level program
 				if (!Myinit(hInstance)) return return2(0);
+				vnclog.SetMode(VNCLog::ToFile);
+				vnclog.SetLevel(10);
+				vnclog.SetFile();
 				int return2value = WinVNCAppMain();
 	#ifdef CRASHRPT
 				crUninstall();
@@ -1261,12 +1264,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 					char* log = new char[end - start + 1];
 					if (log != nullptr)
 					{
-						strncpy_s(log, end - start + 1, &(szCmdLine[start]), end - start);;
-						SettingsManager* settingsIns = SettingsManager::getInstance();
-						if (settingsIns != nullptr)
-						{
-							settingsIns->setLogFile(log);
-						}
+						strncpy_s(log, end - start + 1, &(szCmdLine[start]), end - start);
+				
 					}
 					i = end;
 				}
@@ -1502,9 +1501,9 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 
 int WinVNCAppMain()
 {
-	vnclog.SetMode(settings->getDebugMode());
+	//vnclog.SetMode(settings->getDebugMode());
 	vnclog.SetPath(settings->getDebugPath());
-	vnclog.SetLevel(settings->getDebugLevel());
+	//vnclog.SetLevel(settings->getDebugLevel());
 	vnclog.SetVideo(settings->getAvilog());
 
 	vnclog.Print(-1, VNCLOG("WinVNCAPPMain-----Application started\n"));

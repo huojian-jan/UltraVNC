@@ -460,7 +460,7 @@
       <Profile>true</Profile>
       <UACUIAccess>false</UACUIAccess>
       <EnableUAC>true</EnableUAC>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>

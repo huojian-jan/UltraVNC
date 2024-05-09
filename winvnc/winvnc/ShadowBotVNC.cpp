@@ -19,14 +19,15 @@ void connect2ShadowBot()
 	}
 	catch (const std::exception& ex)
 	{
-		vnclog.Print(LL_INTERR, VNCLOG("%s",ex.what()));
+		vnclog.Print(0, ex.what());
 	}
 }
 
 
 void sendStatus(const std::string &status)
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("send status:%s\n",status));
+	const std::string info = "send status:" + status;
+	vnclog.Print(9,info.c_str());
 	connect2ShadowBot();
 
 	json data;
@@ -45,11 +46,12 @@ void sendStatus(const std::string &status)
 
 	if (!result)
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("status send failed"));
+		vnclog.Print(9, VNCLOG("status send failed"));
 		return;
 	}
 
-	vnclog.Print(LL_INTINFO, VNCLOG("status:%s send successfully\n", status));
+	const std::string msg = "status:" + status + "send successfully\n";
+	vnclog.Print(9, msg.c_str());
 	DisconnectNamedPipe(m_serverPipeHandle);
 }
 

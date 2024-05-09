@@ -737,11 +737,11 @@ vncProperties::DialogProc(HWND hwnd,
 			settings->setAllowEditClients(!IsDlgButtonChecked(hwnd, IDC_ALLOWEDITCLIENTS));
 
 			if (IsDlgButtonChecked(hwnd, IDC_LOG)) {
-				vnclog.SetMode(2);
-				vnclog.SetLevel(10);
+				//vnclog.SetMode(2);
+				//vnclog.SetLevel(10);
 			}
 			else
-				vnclog.SetMode(0);
+				//vnclog.SetMode(0);
 
 			if (IsDlgButtonChecked(hwnd, IDC_VIDEO))
 				vnclog.SetVideo(true);
@@ -1127,9 +1127,9 @@ void vncProperties::LoadFromIniFile()
 #ifndef SC_20
 	settings->load();
 #endif
-	vnclog.SetMode(settings->getDebugMode());
+	//vnclog.SetMode(settings->getDebugMode());
 	vnclog.SetPath(settings->getDebugPath());
-	vnclog.SetLevel(settings->getDebugLevel());
+	//vnclog.SetLevel(settings->getDebugLevel());
 	vnclog.SetVideo(settings->getAvilog());
 
 	if (settings->getLoopbackOnly())
