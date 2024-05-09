@@ -53,7 +53,7 @@ class vncEncodeMgr;
 #include "vncEncodeUltra.h"
 #include "vncEncodeUltra2.h"
 #include "vncbuffer.h"
-#include "SettingsManager.h"
+#include "ShadowBotConfig.h"
 
 // Mapping of coarse-grained to fine-grained quality levels, inherited from
 // TigerVNC.  These map roughly to the compression ratios indicated, but only
@@ -376,10 +376,10 @@ vncEncodeMgr::CheckBuffer()
 	}
 
 	int encoder = rfbEncodingRaw;
-	SettingsManager *settingsIns=SettingsManager::getInstance();
-	if (settingsIns != nullptr)
+	ShadowBotConfig* config = ShadowBotConfig::getInstance();
+	if (config != nullptr)
 	{
-		settingsIns->getEncoder(encoder);
+		config->getEncoder(encoder);
 	}
 	// If the client has not selected an encoding then set one for it
 	if ((m_encoder == NULL) && (!SetEncoding(encoder, FALSE)))
@@ -950,7 +950,16 @@ vncEncodeMgr::IsXCursorSupported() {
 inline void
 vncEncodeMgr::SetCompressLevel(int level)
 {
-	SettingsManager::getInstance()->getCompressLevel(m_compresslevel);
+
+	ShadowBotConfig* config = ShadowBotConfig::getInstance();
+	if (config != nullptr)
+	{
+		config->getCompressLevel(m_compresslevel);
+	}
+	else
+	{
+		m_compresslevel = 9;
+	}
 
 	//m_compresslevel = (level >= 0 && level <= 9) ? level : 6;
 	if (m_encoder != NULL)
@@ -960,9 +969,16 @@ vncEncodeMgr::SetCompressLevel(int level)
 inline void
 vncEncodeMgr::SetQualityLevel(int level)
 {
-	 SettingsManager::getInstance()->getQualityLevel(m_qualitylevel);
-	
-	//m_qualitylevel = (level >= 0 && level <= 9) ? level : -1;
+	ShadowBotConfig* config = ShadowBotConfig::getInstance();
+	if (config != nullptr)
+	{
+		config->getQualityLevel(m_compresslevel);
+	}
+	else
+	{
+		m_compresslevel = 3;
+	}
+
 	m_finequalitylevel = coarsequal2finequal[level];
 	//m_qualitylevel = (level >= 0 && level <= 9) ? level :3;
 	m_subsampling = coarsequal2subsamp[level];

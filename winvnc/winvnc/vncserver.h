@@ -61,7 +61,7 @@ class VirtualDisplay;
 
 // adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
-#include "ShadowBotVNC.h"
+#include "ShadowBotConfig.h"
 
 // Define a datatype to handle lists of windows we wish to notify
 typedef std::list<HWND> vncNotifyList;

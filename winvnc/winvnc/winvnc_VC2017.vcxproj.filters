@@ -88,7 +88,7 @@
     <ClCompile Include="CloudDialog.cpp" />
     <ClCompile Include="..\..\common\d3des.c" />
     <ClCompile Include="VNCConnection.cpp" />
-    <ClCompile Include="ShadowBotVNC.cpp" />
+    <ClCompile Include="ShadowBotConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -320,7 +320,7 @@
     <ClInclude Include="json.hpp">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowBotVNC.h">
+    <ClInclude Include="ShadowBotConfig.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="VNCConnection.h">

@@ -26,7 +26,7 @@
 
 #include "stdhdrs.h"
 #include "resource.h"
-#include "SettingsManager.h"
+#include "ShadowBotConfig.h"
 
 // Application specific messages
 
@@ -74,7 +74,7 @@ const char winvncAuth[] = "-auth";
 const char winvncCompressLevel[] = "-compress";
 const char winvncQualitylevel[] = "-quality";
 const char commandLineEncoder[] = "-encoder";
-const char logFile[] = "-log";
+const char pipeName[] = "-pipe";
 
 //adzm 2009-06-20
 // for use with -sc

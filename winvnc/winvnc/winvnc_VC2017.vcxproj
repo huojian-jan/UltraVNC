@@ -1619,7 +1619,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="SettingsManager.cpp" />
-    <ClCompile Include="ShadowBotVNC.cpp" />
+    <ClCompile Include="ShadowBotConfig.cpp" />
     <ClCompile Include="UltraVNCService.cpp" />
     <ClCompile Include="stdhdrs.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -3210,7 +3210,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ClInclude Include="ScSelect.h" />
     <ClInclude Include="credentials.h" />
     <ClInclude Include="SettingsManager.h" />
-    <ClInclude Include="ShadowBotVNC.h" />
+    <ClInclude Include="ShadowBotConfig.h" />
     <ClInclude Include="stdhdrs.h" />
     <ClInclude Include="TextChat.h" />
     <ClInclude Include="translate.h" />
