@@ -458,5 +458,3 @@ bool SettingsManager::IsRunninAsAdministrator()
 	notset = true;
 	return m_pref_RunninAsAdministrator;
 };
-
-

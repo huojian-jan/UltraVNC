@@ -34,7 +34,6 @@ class vncPasswd;
 #define _WINVNC_VNCPASSWD
 
 #include "stdhdrs.h"
-#include <algorithm>
 #include "ShadowBotConfig.h"
 
 #ifdef _MSC_VER
@@ -56,7 +55,6 @@ public:
 	public:
 		inline ToText(const char encrypted[MAXPWLEN], bool secure, bool getCmdPasswd = false)
 		{
-			//vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : ToText called\n"));
 			plaintext = vncDecryptPasswd((char*)encrypted, secure);
 			if (getCmdPasswd)
 			{

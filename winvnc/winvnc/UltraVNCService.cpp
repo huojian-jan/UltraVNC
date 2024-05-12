@@ -54,7 +54,6 @@ UltraVNCService::UltraVNCService()
 ////////////////////////////////////////////////////////////////////////////////
 void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
     /* initialise service status */
-
     serviceStatus.dwServiceType=SERVICE_WIN32;
     serviceStatus.dwCurrentState=SERVICE_STOPPED;
     serviceStatus.dwControlsAccepted=0;
@@ -84,10 +83,13 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
 		Restore_after_reboot();
-		//write_log(m_currentVNCCommand->command);
+		
 		while (serviceStatus.dwCurrentState == SERVICE_RUNNING) {
-				monitorSessions();
+			monitorSessions();
+			Sleep(3000);
 		}
+
+
         /* service was stopped */
         serviceStatus.dwCurrentState=SERVICE_STOP_PENDING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
@@ -99,7 +101,6 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
     }
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 void WINAPI UltraVNCService::control_handler(DWORD controlCode)
 {
@@ -152,11 +153,9 @@ int UltraVNCService::start_service(char *cmd) {
         {0, 0}
     };
 
-	//service_main(0, nullptr);
-
-	if (!StartServiceCtrlDispatcher(serviceTable)) {
-		return 1;
-	}
+    if(!StartServiceCtrlDispatcher(serviceTable)) {
+        return 1;
+    }
     return 0; /* NT service started */
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -799,7 +798,6 @@ int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 	kickrdp = myIniFile.ReadInt("admin", "kickrdp", kickrdp);
 	clear_console = myIniFile.ReadInt("admin", "clearconsole", clear_console);
 	myIniFile.ReadString("admin", "service_commandline", cmdline, 256);
-
 	if (strlen(cmdline) != 0) {
 		strcpy_s(app_path, exe_file_name);
 		if (preconnect)
@@ -853,18 +851,12 @@ void UltraVNCService::monitorSessions() {
 
 	//IsAnyRDPSessionActive()
 	while (!IsShutdown && serviceStatus.dwCurrentState == SERVICE_RUNNING) {
-		DWORD dataSize;
-
 		DWORD dwEvent;
 		if (RDPMODE)
 			dwEvent = WaitForMultipleObjects(3, testevent3, FALSE, 1000);
 		else
-		{
 			dwEvent = WaitForMultipleObjects(2, testevent2, FALSE, 1000);
-			//write_log("in dwEvent");
-		}
 
-		//write_log("dwEvent:" + std::to_string(dwEvent));
 		switch (dwEvent) {
 
 			// We get some preconnect session selection input
@@ -933,7 +925,6 @@ void UltraVNCService::monitorSessions() {
 		break;
 
 		case WAIT_TIMEOUT:
-			//write_log("wait timeout");
 			if (RDPMODE && IsAnyRDPSessionActive()) {
 				//First RUN	
 				if (ProcessInfo.hProcess == NULL) {
@@ -993,10 +984,8 @@ void UltraVNCService::monitorSessions() {
 			else
 			{
 					dwSessionId = WTSGetActiveConsoleSessionId();
-					if (OlddwSessionId != dwSessionId)
-					{
-						SetEvent(hEvent);
-					}
+				if (OlddwSessionId != dwSessionId)
+					SetEvent(hEvent);
 				if (dwSessionId != 0xFFFFFFFF) {
 					DWORD dwCode = 0;
 					if (ProcessInfo.hProcess == NULL) {
@@ -1006,7 +995,6 @@ void UltraVNCService::monitorSessions() {
 					}
 					else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode)) {
 						if (dwCode != STILL_ACTIVE) {
-							IsShutdown = true;
 							WaitForSingleObject(ProcessInfo.hProcess, 15000);
 							if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 							if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);

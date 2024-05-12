@@ -119,8 +119,8 @@ char* vncServer::generateCode() {
 				pAdapterInfo->Address[2], pAdapterInfo->Address[5]);
 
 			if (!(pAdapterInfo->Address[0] == 0 && pAdapterInfo->Address[4] == 0 &&
-					pAdapterInfo->Address[3] == 0 && pAdapterInfo->Address[2] == 0 &&
-					pAdapterInfo->Address[5] == 0)) {
+				pAdapterInfo->Address[3] == 0 && pAdapterInfo->Address[2] == 0 &&
+				pAdapterInfo->Address[5] == 0)) {
 				free(AdapterInfo);
 				return mac_addr; // caller must free.
 			}
@@ -198,7 +198,8 @@ vncServer::~vncServer()
 	cloudThread->stopThread();
 	delete cloudThread;
 #endif
-	ShutdownServer();}
+	ShutdownServer();
+}
 
 void
 vncServer::ShutdownServer()
@@ -534,7 +535,7 @@ vncServer::Authenticated(vncClientId clientid)
 				wchar_t szInfo[256] = { 0 };
 				wchar_t szTitle[63] = { 0 };
 				if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0)) {
-					_snwprintf_s(szTitle, 63,L"Connection from: %hs", client->GetRepeaterID());
+					_snwprintf_s(szTitle, 63, L"Connection from: %hs", client->GetRepeaterID());
 				}
 				else {
 					_snwprintf_s(szTitle, 63, L"Connection from: %hs", client->GetClientNameName());
@@ -1050,11 +1051,7 @@ vncServer::DoNotify(UINT message, WPARAM wparam, LPARAM lparam)
 	}
 	if (message == WM_SRV_CLIENT_AUTHENTICATED)
 	{
-		//for (int i = 0; i < 10000; i++)
-		//{
-		//	Sleep(100);
-		//}
-			sendStatus("connected");
+		sendStatus("connected");
 	}
 	else if (message == WM_SRV_CLIENT_DISCONNECT)
 	{
@@ -1270,7 +1267,7 @@ vncServer::EnableConnections(BOOL On)
 					m_socketConn = NULL;
 					return FALSE;
 				}
-			}
+				}
 			else {
 				// No autoportselect
 				if (!m_socketConn->Init(this, m_port)) {
@@ -1283,8 +1280,8 @@ vncServer::EnableConnections(BOOL On)
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
 			vnclog.Print(LL_SOCKINFO, VNCLOG("SockConnect  Done %d\n"), On);
+			}
 		}
-	}
 	else {
 		// Is there a listening socket?
 		if (m_socketConn != NULL) {
@@ -1335,7 +1332,7 @@ vncServer::EnableHTTPConnect(BOOL enable)
 				}
 			}
 		}
-	}
+}
 	else {
 		if (m_httpConn != NULL) {
 			// Close the socket
@@ -1769,9 +1766,9 @@ vncServer::SetScreenOffset(int x, int y, bool single_display)
 BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 {
 	//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Entry \n"));
-	if (AuthClientCount() > 0) 
+	if (AuthClientCount() > 0)
 		return FALSE;
-	if (!settings->getUseDSMPlugin()) 
+	if (!settings->getUseDSMPlugin())
 		return FALSE;
 	if (m_pDSMPlugin->IsLoaded()) {
 		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Is Loaded \n"));
@@ -1779,7 +1776,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 		// sf@2003 - We check if the loaded plugin is the same than
 		// the currently selected one or not
 		m_pDSMPlugin->DescribePlugin();
-		if ( bForceReload) {
+		if (bForceReload) {
 			//if (bForceReload)
 			//	vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - FORCE RELOADING OF THE PLUGIN \n"));
 			//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - New one - Unload the current \n"));
@@ -2107,7 +2104,7 @@ void vncServer::SetAutoPortSelect(const BOOL autoport)
 		EnableConnections(SockConnected());
 };
 
-void vncServer::cloudConnect(bool start, char *cloudServer)
+void vncServer::cloudConnect(bool start, char* cloudServer)
 {
 #ifdef _CLOUD
 	if (start)
@@ -2126,7 +2123,7 @@ bool vncServer::isCloudThreadRunning()
 #endif
 }
 
-char *vncServer::getExternalIpAddress()
+char* vncServer::getExternalIpAddress()
 {
 #ifdef _CLOUD
 	return cloudThread->getExternalIpAddress();
@@ -2150,5 +2147,3 @@ void vncServer::setVNcPort()
 	cloudThread->setVNcPort(m_port);
 #endif
 }
-
-

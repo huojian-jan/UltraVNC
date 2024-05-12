@@ -44,6 +44,9 @@
 #include <string>
 #include <ctime>
 #include <sstream>
+#include <iostream>
+#include <fstream>
+
 class VNCLog
 {
 public:

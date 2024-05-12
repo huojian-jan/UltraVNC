@@ -44,7 +44,6 @@
 #include <string>
 #include <sstream>
 #include "resource.h"
-#include <typeinfo>
 
 // Custom
 #include "vncserver.h"
@@ -1249,12 +1248,6 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	else
 	{
 		vncPasswd::ToText plain(settings ->getPasswd(), settings->getSecure(),true);
-		//char* passwd = SettingsManager::getInstance()->getAuthPassword();
-		////char* p = new char[strlen(passwd)];
-		////strcpy_s(p, passwd);
-		//strcpy(plain.plaintext,passwd);
-		//string type_name = typeid(plain).name();
-
 		if (!m_auth && m_ms_logon)
 		{
 			auth_types.push_back(rfbUltraVNC_MsLogonIIAuth);

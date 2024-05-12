@@ -1,7 +1,5 @@
 #pragma once
-
 #include "stdhdrs.h"
-#include <string>
 #include "inifile.h"
 #include "rfb.h"
 
@@ -230,6 +228,7 @@ public:
 
 	void setCloudServer(TCHAR* value) { strcpy_s(m_pref_cloudServer, value); };
 	TCHAR* getCloudServer() { return m_pref_cloudServer; };
+
 
 #ifdef IPV6V4
 	// Whether or not to allow connections from the local machine

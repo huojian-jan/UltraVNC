@@ -49,11 +49,6 @@ class VirtualDisplay;
 #include "vncclient.h"
 #include "rfbRegion.h"
 #include "vncpasswd.h"
-#include <string>
-#include <iostream>
-#include <cstdlib>
-#include <fstream>
-#include <Windows.h>
 // Includes
 #include "stdhdrs.h"
 #include <omnithread.h>

@@ -25,8 +25,6 @@
 
 #include "stdhdrs.h"
 #include <io.h>
-#include <iostream>
-#include <fstream>
 #include "vnclog.h"
 #include "inifile.h"
 #include "cstdlib"
@@ -125,7 +123,16 @@ void VNCLog::SetFile()
 	}
 
 	SetPath(file_path);
-	strcpy(m_filename, file.c_str());
+	if (file_path != "")
+	{
+		strcpy(m_filename, file.c_str());
+	}
+	else
+	{
+		strcpy(m_filename, m_path);
+		strcpy(m_filename, "\\");
+		strcpy(m_filename, ".VNC_Server.log");
+	}
 	m_append = true;
 	if (m_tofile)
 		OpenFile();
@@ -195,7 +202,7 @@ std::string VNCLog::GenerateLogPath(const std::string& filePath, std::size_t max
 		//日志文件是新的
 		return filePath;
 	}
-}
+		}
 
 void VNCLog::OpenFile()
 {
@@ -244,11 +251,11 @@ void VNCLog::OpenFile()
 	}
 	if (m_append) {
 		SetFilePointer(hlogfile, 0, NULL, FILE_END);
-	}
+}
 	else {
 		SetEndOfFile(hlogfile);
 	}
-}
+	}
 
 // if a log file is open, close it now.
 void VNCLog::CloseFile() {
@@ -275,7 +282,7 @@ inline void VNCLog::ReallyPrintLine(const char* line)
 		DWORD byteswritten;
 		WriteFile(hlogfile, line, strlen(line), &byteswritten, NULL);
 	}
-}
+	}
 
 void VNCLog::ReallyPrint(const char* format, va_list ap)
 {
