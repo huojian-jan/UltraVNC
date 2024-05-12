@@ -59,8 +59,6 @@
  * affecting alignment.
  */
 
-#pragma once
-
 typedef struct {
     CARD16 x;
     CARD16 y;
