@@ -429,7 +429,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_XZ;_USE_DESKTOPDUPLICATION;_RDPMODE;remIPV6STRICT;remIPV6V4;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_XZ;_USE_DESKTOPDUPLICATION;_RDPMODE;remIPV6STRICT;remIPV6V4;_WINSOCK_DEPRECATED_NO_WARNINGS;__SHADOWBOT_BUILD__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -458,6 +458,9 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <Profile>true</Profile>
+      <UACUIAccess>false</UACUIAccess>
+      <EnableUAC>true</EnableUAC>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -1329,7 +1332,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     </ClCompile>
     <ClCompile Include="cadthread.cpp" />
     <ClCompile Include="CloudDialog.cpp" />
-    <ClCompile Include="ConnectionStatus.cpp" />
+    <ClCompile Include="VNCConnection.cpp" />
     <ClCompile Include="CpuUsage.cpp" />
     <ClCompile Include="..\..\rfb\dh.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -1616,7 +1619,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="SettingsManager.cpp" />
-    <ClCompile Include="ShadowBotVNC.cpp" />
+    <ClCompile Include="ShadowBotConfig.cpp" />
     <ClCompile Include="UltraVNCService.cpp" />
     <ClCompile Include="stdhdrs.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -3178,7 +3181,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ClInclude Include="..\loadmemory\MemoryModule.h" />
     <ClInclude Include="cadthread.h" />
     <ClInclude Include="CloudDialog.h" />
-    <ClInclude Include="ConnectionStatus.h" />
+    <ClInclude Include="VNCConnection.h" />
     <ClInclude Include="CpuUsage.h" />
     <ClInclude Include="DeskdupEngine.h" />
     <ClInclude Include="Dtwinver.h" />
@@ -3207,7 +3210,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ClInclude Include="ScSelect.h" />
     <ClInclude Include="credentials.h" />
     <ClInclude Include="SettingsManager.h" />
-    <ClInclude Include="ShadowBotVNC.h" />
+    <ClInclude Include="ShadowBotConfig.h" />
     <ClInclude Include="stdhdrs.h" />
     <ClInclude Include="TextChat.h" />
     <ClInclude Include="translate.h" />

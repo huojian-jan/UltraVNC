@@ -54,12 +54,6 @@ UltraVNCService::UltraVNCService()
 ////////////////////////////////////////////////////////////////////////////////
 void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
     /* initialise service status */
-	write_log(">>>>>>>>>>>>>>>>>>>>>>>service started>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-	m_currentVNCCommand = new VNC_Command;
-
-	std::thread t(setupServicePipe);
-	t.detach();
-
     serviceStatus.dwServiceType=SERVICE_WIN32;
     serviceStatus.dwCurrentState=SERVICE_STOPPED;
     serviceStatus.dwControlsAccepted=0;
@@ -89,28 +83,10 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
 		Restore_after_reboot();
-		//write_log(m_currentVNCCommand->command);
+		
 		while (serviceStatus.dwCurrentState == SERVICE_RUNNING) {
-			write_log("=============set up service pipe=====================");
-			{
-				std::unique_lock<std::mutex> lock(cmd_mtx);
-				cmd_cond_vr.wait(lock);
-			}
-
-			if (m_currentVNCCommand->command == "stop")
-			{
-				TerminateProcess(ProcessInfo.hProcess, 0);
-			}
-			else if (m_currentVNCCommand->command == "start")
-			{
-				monitorSessions();
-			}
-			else
-			{
-				write_log("invalid command:" + m_currentVNCCommand->command);
-			}
-			//Sleep(1000);
-			write_log("current command:" + m_currentVNCCommand->command);
+			monitorSessions();
+			Sleep(3000);
 		}
 
 
@@ -177,11 +153,9 @@ int UltraVNCService::start_service(char *cmd) {
         {0, 0}
     };
 
-	//service_main(0, nullptr);
-
-	if (!StartServiceCtrlDispatcher(serviceTable)) {
-		return 1;
-	}
+    if(!StartServiceCtrlDispatcher(serviceTable)) {
+        return 1;
+    }
     return 0; /* NT service started */
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -824,9 +798,6 @@ int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 	kickrdp = myIniFile.ReadInt("admin", "kickrdp", kickrdp);
 	clear_console = myIniFile.ReadInt("admin", "clearconsole", clear_console);
 	myIniFile.ReadString("admin", "service_commandline", cmdline, 256);
-
-	strcpy(cmdline, m_currentVNCCommand->args.c_str());
-	
 	if (strlen(cmdline) != 0) {
 		strcpy_s(app_path, exe_file_name);
 		if (preconnect)
@@ -880,31 +851,17 @@ void UltraVNCService::monitorSessions() {
 
 	//IsAnyRDPSessionActive()
 	while (!IsShutdown && serviceStatus.dwCurrentState == SERVICE_RUNNING) {
-		write_log("checking ...");
-		DWORD dataSize;
-		if (m_currentVNCCommand->command=="stop")
-		{
-			TerminateProcess(ProcessInfo.hProcess, 0);
-			IsShutdown = true;
-			continue;
-		}
-
 		DWORD dwEvent;
 		if (RDPMODE)
 			dwEvent = WaitForMultipleObjects(3, testevent3, FALSE, 1000);
 		else
-		{
 			dwEvent = WaitForMultipleObjects(2, testevent2, FALSE, 1000);
-			//write_log("in dwEvent");
-		}
 
-		//write_log("dwEvent:" + std::to_string(dwEvent));
 		switch (dwEvent) {
 
 			// We get some preconnect session selection input
 		case WAIT_OBJECT_0 + 2:
 		{
-			write_log("2");
 			//Tell winvnc to stop
 			SetEvent(hEvent);
 			requestedSessionID = *a;
@@ -937,14 +894,12 @@ void UltraVNCService::monitorSessions() {
 
 		//stopServiceEvent, exit while loop
 		case WAIT_OBJECT_0 + 0:
-			write_log("0");
 			IsShutdown = true;
 			break;
 
 			//cad request
 		case WAIT_OBJECT_0 + 1:
 		{
-			write_log("1");
 			typedef VOID(WINAPI* SendSas)(BOOL asUser);
 			HINSTANCE Inst = LoadLibrary("sas.dll");
 			SendSas sendSas = (SendSas)GetProcAddress(Inst, "SendSAS");
@@ -970,7 +925,6 @@ void UltraVNCService::monitorSessions() {
 		break;
 
 		case WAIT_TIMEOUT:
-			//write_log("wait timeout");
 			if (RDPMODE && IsAnyRDPSessionActive()) {
 				//First RUN	
 				if (ProcessInfo.hProcess == NULL) {
@@ -982,10 +936,8 @@ void UltraVNCService::monitorSessions() {
 					}
 					else {
 						dwSessionId = 0xFFFFFFFF;
-						write_log("0xFFFFFFFF");
 						int sessidcounter = 0;
 						while (dwSessionId == 0xFFFFFFFF && !IsShutdown) {
-							write_log("inner while loop");
 							dwSessionId = WTSGetActiveConsoleSessionId();
 							Sleep(1000);
 							sessidcounter++;
@@ -1011,12 +963,10 @@ void UltraVNCService::monitorSessions() {
 					ProcessInfo.hProcess = NULL;
 					ProcessInfo.hThread = NULL;
 					RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
-					write_log("in exit code");
 					Sleep(1000);
 					goto whileloop;
 				}
 
-				write_log("before still alive ");
 				if (dwCode == STILL_ACTIVE)
 					goto whileloop;
 				if (ProcessInfo.hProcess)
@@ -1033,26 +983,18 @@ void UltraVNCService::monitorSessions() {
 			}//timeout
 			else
 			{
-				//write_log("WTSGetActiveConsoleSessionId");
 					dwSessionId = WTSGetActiveConsoleSessionId();
-					//write_log(std::to_string(dwSessionId));
-					if (OlddwSessionId != dwSessionId)
-					{
-						SetEvent(hEvent);
-						write_log("old not equal dwSessionId");
-					}
+				if (OlddwSessionId != dwSessionId)
+					SetEvent(hEvent);
 				if (dwSessionId != 0xFFFFFFFF) {
 					DWORD dwCode = 0;
 					if (ProcessInfo.hProcess == NULL) {
 						//First RUNf
-							write_log("may be first run");
 						LaunchProcessWin(dwSessionId, false, false);
 						OlddwSessionId = dwSessionId;
 					}
 					else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode)) {
 						if (dwCode != STILL_ACTIVE) {
-							write_log("vnc server exited");
-							IsShutdown = true;
 							WaitForSingleObject(ProcessInfo.hProcess, 15000);
 							if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 							if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
@@ -1061,7 +1003,6 @@ void UltraVNCService::monitorSessions() {
 							int sessidcounter = 0;
 							while (dwSessionId == 0xFFFFFFFF && !IsShutdown) {
 								Sleep(1000);
-								write_log("vnc server restarted-------------------");
 								dwSessionId = WTSGetActiveConsoleSessionId();
 								sessidcounter++;
 								if (sessidcounter > 10) break;
@@ -1071,7 +1012,6 @@ void UltraVNCService::monitorSessions() {
 						}
 					}
 					else {
-						write_log("vnc server running fine......................");
 						if (ProcessInfo.hProcess)
 							CloseHandle(ProcessInfo.hProcess);
 						if (ProcessInfo.hThread)

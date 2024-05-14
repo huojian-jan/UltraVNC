@@ -41,6 +41,11 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <time.h>
+#include <string>
+#include <ctime>
+#include <sstream>
+#include <iostream>
+#include <fstream>
 
 class VNCLog
 {
@@ -76,7 +81,9 @@ public:
 
 	void SetVideo(bool enable) { m_video = enable; };
 	bool GetVideo() { return m_video; };
-	void SetPath(char path[512]);
+
+	void SetPath(const std::string& path);
+
 	char* GetPath();
 	void ClearAviConfig();
 
@@ -87,6 +94,12 @@ public:
 	// Change or set the logging filename.  This only has an effect if
 	// the log mode includes ToFile
 	void SetFile();
+
+#if __SHADOWBOT_BUILD__
+	void GetLogPath(std::string& path);
+	void GetCurrentDate(std::string& date);
+	std::string GenerateLogPath(const std::string& filePath, std::size_t maxSize, int suffix = 1);
+#endif // __SHADOWBOT_BUILD__
 
 	virtual ~VNCLog();
 

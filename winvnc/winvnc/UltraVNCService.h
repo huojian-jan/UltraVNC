@@ -1,7 +1,6 @@
 #pragma once
 #ifndef SC_20
 #define MAXSTRLENGTH    255
-#include "ShadowBotVNC.h"
 
 typedef struct _CPAU_PARAM {
 	DWORD   cbSize;
@@ -40,7 +39,7 @@ typedef BOOLEAN(WINAPI* pWinStationQueryInformationW)(
 
 class UltraVNCService {
 	
-	public:
+private:
 	static void WINAPI service_main(DWORD argc, LPTSTR* argv);
 	static void WINAPI control_handler(DWORD controlCode);
 	static DWORD WINAPI control_handler_ex(DWORD controlCode, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext);
