@@ -49,7 +49,6 @@ class VirtualDisplay;
 #include "vncclient.h"
 #include "rfbRegion.h"
 #include "vncpasswd.h"
-
 // Includes
 #include "stdhdrs.h"
 #include <omnithread.h>
@@ -57,6 +56,7 @@ class VirtualDisplay;
 
 // adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
+#include "ShadowBotConfig.h"
 
 // Define a datatype to handle lists of windows we wish to notify
 typedef std::list<HWND> vncNotifyList;
@@ -370,5 +370,4 @@ protected:
 	BOOL sethook;
 	CloudThread* cloudThread;
 };
-
 #endif
