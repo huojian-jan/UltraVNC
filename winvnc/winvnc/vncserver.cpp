@@ -1049,6 +1049,8 @@ vncServer::DoNotify(UINT message, WPARAM wparam, LPARAM lparam)
 	for (i = m_notifyList.begin(); i != m_notifyList.end(); i++) {
 		PostMessage((*i), message, wparam, lparam);
 	}
+
+#ifdef __SHADOWBOT_BUILD__
 	if (message == WM_SRV_CLIENT_AUTHENTICATED)
 	{
 		sendStatus("connected");
@@ -1057,6 +1059,7 @@ vncServer::DoNotify(UINT message, WPARAM wparam, LPARAM lparam)
 	{
 		sendStatus("disconnected");
 	}
+#endif // __SHADOWBOT_BUILD__
 }
 
 void
@@ -1267,7 +1270,7 @@ vncServer::EnableConnections(BOOL On)
 					m_socketConn = NULL;
 					return FALSE;
 				}
-				}
+			}
 			else {
 				// No autoportselect
 				if (!m_socketConn->Init(this, m_port)) {
@@ -1280,8 +1283,8 @@ vncServer::EnableConnections(BOOL On)
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
 			vnclog.Print(LL_SOCKINFO, VNCLOG("SockConnect  Done %d\n"), On);
-			}
 		}
+	}
 	else {
 		// Is there a listening socket?
 		if (m_socketConn != NULL) {
@@ -1332,7 +1335,7 @@ vncServer::EnableHTTPConnect(BOOL enable)
 				}
 			}
 		}
-}
+	}
 	else {
 		if (m_httpConn != NULL) {
 			// Close the socket
@@ -2004,10 +2007,10 @@ void vncServer::actualRetryThread()
 				if (m_fAutoReconnect && strlen(m_szAutoReconnectAdr) > 0 && !fShutdownOrdered)
 					Sleep(5000);
 			}
+			}
 		}
-	}
 	vnclog.Print(LL_INTINFO, VNCLOG("leaving reconnectThread....\n"));
-}
+	}
 
 void vncServer::NotifyClients_StateChange(CARD32 state, CARD32 value)
 {

@@ -53,21 +53,22 @@ public:
 	class ToText
 	{
 	public:
-		inline ToText(const char encrypted[MAXPWLEN], bool secure, bool getCmdPasswd = false)
+		inline ToText(const char encrypted[MAXPWLEN], bool secure)
 		{
 			plaintext = vncDecryptPasswd((char*)encrypted, secure);
-			if (getCmdPasswd)
-			{
-				//从命令行读取密码，存到SettingsManager中，这里从SettingsManager中获取密码
-				std::string cmdPasswd;
-				ShadowBotConfig::getInstance()->getAuthPassword(cmdPasswd);
 
-				size_t cpy_len = std::min<size_t>(strlen(cmdPasswd.c_str()), MAXPWLEN);
-				strncpy(plaintext, cmdPasswd.c_str(),cpy_len);
+#ifdef __SHADOWBOT_BUILD__
+			//从命令行读取密码，存到SettingsManager中，这里从SettingsManager中获取密码
+			std::string cmdPasswd;
+			ShadowBotConfig::getInstance()->getAuthPassword(cmdPasswd);
 
-				size_t diff_size = MAXPWLEN - cpy_len;
-				memset(plaintext + cpy_len, '\0', diff_size * sizeof(char));
-			}
+			size_t cpy_len = std::min<size_t>(strlen(cmdPasswd.c_str()), MAXPWLEN);
+			strncpy(plaintext, cmdPasswd.c_str(), cpy_len);
+
+			size_t diff_size = MAXPWLEN - cpy_len;
+			memset(plaintext + cpy_len, '\0', diff_size * sizeof(char));
+#endif // __SHADOWBOT_BUILD__
+
 		}
 		inline ~ToText()
 		{

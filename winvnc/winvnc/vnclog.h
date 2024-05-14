@@ -81,7 +81,9 @@ public:
 
 	void SetVideo(bool enable) { m_video = enable; };
 	bool GetVideo() { return m_video; };
-	void SetPath(const std::string &path);
+
+	void SetPath(const std::string& path);
+
 	char* GetPath();
 	void ClearAviConfig();
 
@@ -92,9 +94,12 @@ public:
 	// Change or set the logging filename.  This only has an effect if
 	// the log mode includes ToFile
 	void SetFile();
+
+#if __SHADOWBOT_BUILD__
 	void GetLogPath(std::string& path);
 	void GetCurrentDate(std::string& date);
 	std::string GenerateLogPath(const std::string& filePath, std::size_t maxSize, int suffix = 1);
+#endif // __SHADOWBOT_BUILD__
 
 	virtual ~VNCLog();
 

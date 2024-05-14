@@ -206,7 +206,7 @@ vncProperties::DialogProc(HWND hwnd,
 		_this = (vncProperties*)lParam;
 		_this->m_dlgvisible = TRUE;
 
-		_this->LoadFromIniFile();		
+		_this->LoadFromIniFile();
 
 		// Initialise the properties controls
 		HWND hConnectSock = GetDlgItem(hwnd, IDC_CONNECT_SOCK);
@@ -494,10 +494,10 @@ vncProperties::DialogProc(HWND hwnd,
 		_this->ExpandBox(hwnd, !_this->bExpanded);
 		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
 
-		SetForegroundWindow(hwnd);		
+		SetForegroundWindow(hwnd);
 		return FALSE; // Because we've set the focus
 	}
-	case WM_DESTROY :
+	case WM_DESTROY:
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -607,7 +607,7 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 			HWND hConnectSock = GetDlgItem(hwnd, IDC_CONNECT_SOCK);
 			_this->m_server->EnableConnections(SendMessage(hConnectSock, BM_GETCHECK, 0, 0) == BST_CHECKED);
-			settings->setEnableConnections(SendMessage(hConnectSock, BM_GETCHECK, 0, 0) == BST_CHECKED);			
+			settings->setEnableConnections(SendMessage(hConnectSock, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 			// Update display/port controls on pressing the "Apply" button
 			if (LOWORD(wParam) == IDC_APPLY)
@@ -737,11 +737,17 @@ vncProperties::DialogProc(HWND hwnd,
 			settings->setAllowEditClients(!IsDlgButtonChecked(hwnd, IDC_ALLOWEDITCLIENTS));
 
 			if (IsDlgButtonChecked(hwnd, IDC_LOG)) {
-				//vnclog.SetMode(2);
-				//vnclog.SetLevel(10);
+
+#ifndef __SHADOWBOT_BUILD__
+				vnclog.SetMode(2);
+				vnclog.SetLevel(10);
+#endif // !__SHADOWBOT_BUILD__
+
 			}
 			else
-				//vnclog.SetMode(0);
+#ifndef __SHADOWBOT_BUILD__
+				vnclog.SetMode(0);
+#endif // !__SHADOWBOT_BUILD__
 
 			if (IsDlgButtonChecked(hwnd, IDC_VIDEO))
 				vnclog.SetVideo(true);
@@ -1055,7 +1061,7 @@ vncProperties::DialogProc(HWND hwnd,
 		}
 		break;
 	case WM_SIZE:
-			_this->SD_OnSize(hwnd, wParam, LOWORD(lParam), HIWORD(lParam));			
+		_this->SD_OnSize(hwnd, wParam, LOWORD(lParam), HIWORD(lParam));
 		break;
 	case WM_HSCROLL:
 		_this->SD_OnHScroll(hwnd, LOWORD(wParam));
@@ -1127,10 +1133,13 @@ void vncProperties::LoadFromIniFile()
 #ifndef SC_20
 	settings->load();
 #endif
-	//vnclog.SetMode(settings->getDebugMode());
+
+#ifndef __SHADOWBOT_BUILD__
+	vnclog.SetMode(settings->getDebugMode());
 	vnclog.SetPath(settings->getDebugPath());
-	//vnclog.SetLevel(settings->getDebugLevel());
+	vnclog.SetLevel(settings->getDebugLevel());
 	vnclog.SetVideo(settings->getAvilog());
+#endif // __SHADOWBOT_BUILD__
 
 	if (settings->getLoopbackOnly())
 		settings->setAllowLoopback(true);
@@ -1382,7 +1391,7 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 	{
 		_ASSERT(!bExpanded);
 		maxWidth = cx;
-		maxHeight =cy;
+		maxHeight = cy;
 		SetWindowPos(hDlg, NULL, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
 
 		// make sure that the entire dialog box is visible on the user's
@@ -1457,7 +1466,7 @@ void vncProperties::SD_OnHScroll(HWND hwnd, UINT code)
 	SD_OnHVScroll(hwnd, SB_HORZ, code);
 }
 
-void vncProperties::SD_OnVScroll(HWND hwnd,  UINT code)
+void vncProperties::SD_OnVScroll(HWND hwnd, UINT code)
 {
 	SD_OnHVScroll(hwnd, SB_VERT, code);
 }

@@ -1112,7 +1112,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				}
 				continue;
 			}
-
+#ifdef __SHADOWBOT_BUILD__
 			if (strncmp(&szCmdLine[i], winvncAuth, strlen(winvncAuth)) == 0)
 			{
 				i += strlen(winvncAuth);
@@ -1272,6 +1272,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				}
 				continue;
 			}
+#endif 
 
 			//adzm 2009-06-20
 			if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)

@@ -40,7 +40,13 @@ const int VNCLog::ToConsole = 4;
 static const int LINE_BUFFER_SIZE = 1024;
 
 VNCLog::VNCLog()
+
+#if __SHADOWBOT_BUILD__
 	: m_tofile(true)
+#else
+	: m_tofile(false)
+#endif // __SHADOWBOT_BUILD__
+
 	, m_todebug(false)
 	, m_toconsole(false)
 	, m_mode(0)
@@ -108,10 +114,17 @@ void VNCLog::SetFile()
 #ifdef SC_20
 	return;
 #endif
-	char temp[512];
-	//IniFile myIniFile;
-	//myIniFile.ReadString("admin", "path", temp,512);
 
+#ifndef __SHADOWBOT_BUILD__
+	char temp[512];
+	IniFile myIniFile;
+	myIniFile.ReadString("admin", "path", temp, 512);
+
+	SetPath(std::string(temp));
+	strcpy_s(m_filename, m_path);
+	strcat_s(m_filename, "\\");
+	strcat_s(m_filename, "WinVNC.log");
+#else
 	std::string file;
 	std::string file_path;
 
@@ -133,12 +146,16 @@ void VNCLog::SetFile()
 		strcpy(m_filename, "\\");
 		strcpy(m_filename, ".VNC_Server.log");
 	}
+#endif // !__SHADOWBOT_BUILD__
+
 	m_append = true;
 	if (m_tofile)
 		OpenFile();
 }
 
-void VNCLog::GetLogPath(std::string& path)
+#ifdef __SHADOWBOT_BUILD__
+void 
+VNCLog::GetLogPath(std::string& path)
 {
 	std::string log_path;
 	std::string log_name = ".VNC_Server.log";
@@ -161,8 +178,8 @@ void VNCLog::GetLogPath(std::string& path)
 	path = GenerateLogPath(log_path, maxSize);
 }
 
-
-void VNCLog::GetCurrentDate(std::string& date)
+void 
+VNCLog::GetCurrentDate(std::string& date)
 {
 	const std::time_t currentTime = std::time(nullptr);
 	const std::tm* localTime = std::localtime(&currentTime);
@@ -172,7 +189,8 @@ void VNCLog::GetCurrentDate(std::string& date)
 	date = buffer;
 }
 
-std::string VNCLog::GenerateLogPath(const std::string& filePath, std::size_t maxSize, int suffix)
+std::string 
+VNCLog::GenerateLogPath(const std::string& filePath, std::size_t maxSize, int suffix)
 {
 	struct stat buffer;
 	if (stat(filePath.c_str(), &buffer) == 0) {
@@ -202,7 +220,9 @@ std::string VNCLog::GenerateLogPath(const std::string& filePath, std::size_t max
 		//日志文件是新的
 		return filePath;
 	}
-		}
+}
+#endif // __SHADOWBOT_BUILD__
+
 
 void VNCLog::OpenFile()
 {
@@ -356,6 +376,7 @@ void VNCLog::SetPath(const std::string& path)
 	else
 		strcpy_s(m_path, path.c_str());
 }
+
 char* VNCLog::GetPath()
 {
 	if (strlen(m_path) == 0)

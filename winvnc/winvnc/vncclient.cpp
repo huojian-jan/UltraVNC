@@ -1247,7 +1247,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	}		
 	else
 	{
-		vncPasswd::ToText plain(settings ->getPasswd(), settings->getSecure(),true);
+		vncPasswd::ToText plain(settings ->getPasswd(), settings->getSecure());
 		if (!m_auth && m_ms_logon)
 		{
 			auth_types.push_back(rfbUltraVNC_MsLogonIIAuth);
@@ -1771,7 +1771,7 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 
 BOOL vncClientThread::AuthVnc(std::string& auth_message)
 {
-	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure(),true);
+	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
 
 	BOOL auth_ok = FALSE;
 	{
@@ -2810,6 +2810,12 @@ vncClientThread::run(void* arg)
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("defaulting to raw encoder\n"));
 					omni_mutex_lock l(m_client->GetUpdateLock(), 86);
+#ifdef __SHADOWBOT_BUILD__
+					if (!m_client->m_encodemgr.SetEncoding(Swap32IfLE(rfbEncodingZSTDRLE), FALSE))
+#else
+					if (!m_client->m_encodemgr.SetEncoding(Swap32IfLE(rfbEncodingRaw), FALSE))
+#endif // __SHADOWBOT_BUILD__
+
 					if (!m_client->m_encodemgr.SetEncoding(Swap32IfLE(rfbEncodingZSTDRLE), FALSE))
 					{
 						vnclog.Print(LL_INTERR, VNCLOG("failed to select raw encoder!\n"));

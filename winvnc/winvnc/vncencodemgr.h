@@ -375,6 +375,7 @@ vncEncodeMgr::CheckBuffer()
 		m_clientformat = m_scrinfo.format;
 	}
 
+#if __SHADOWBOT_BUILD__
 	int encoder = rfbEncodingRaw;
 	ShadowBotConfig* config = ShadowBotConfig::getInstance();
 	if (config != nullptr)
@@ -383,6 +384,9 @@ vncEncodeMgr::CheckBuffer()
 	}
 	// If the client has not selected an encoding then set one for it
 	if ((m_encoder == NULL) && (!SetEncoding(encoder, FALSE)))
+#else
+	if ((m_encoder == NULL) && (!SetEncoding(rfbEncodingRaw, FALSE)))
+#endif // __SHADOWBOT_BUILD__
 		return FALSE;
 
 	// Check the client buffer is sufficient
@@ -598,8 +602,13 @@ vncEncodeMgr::SetEncoding(CARD32 encoding, BOOL reinitialize)
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
-		//((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = FALSE;
+
+#ifdef __SHADOWBOT_BUILD__
 		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = TRUE;
+		//((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = FALSE;
+#else
+		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = FALSE;
+#endif // __SHADOWBOT_BUILD__
 		((vncEncodeZRLE*)zrleEncoder)->set_use_zstd(false);
 		break;
 
@@ -685,7 +694,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding, BOOL reinitialize)
 			m_encoder = m_hold_zlibhex_encoder;
 		if (m_encoder == NULL)
 			return FALSE;
-		zlibhex_encoder_in_use = true;//
+		zlibhex_encoder_in_use = true;
 		((vncEncodeZlibHex*)m_encoder)->set_use_zstd(true);
 		break;
 
@@ -950,7 +959,9 @@ vncEncodeMgr::IsXCursorSupported() {
 inline void
 vncEncodeMgr::SetCompressLevel(int level)
 {
-
+#ifndef __SHADOWBOT_BUILD__
+	m_compresslevel = (level >= 0 && level <= 9) ? level : 6;
+#else
 	ShadowBotConfig* config = ShadowBotConfig::getInstance();
 	if (config != nullptr)
 	{
@@ -960,8 +971,7 @@ vncEncodeMgr::SetCompressLevel(int level)
 	{
 		m_compresslevel = 9;
 	}
-
-	//m_compresslevel = (level >= 0 && level <= 9) ? level : 6;
+#endif // __SHADOWBOT_BUILD__
 	if (m_encoder != NULL)
 		m_encoder->SetCompressLevel(m_compresslevel);
 }
@@ -969,19 +979,30 @@ vncEncodeMgr::SetCompressLevel(int level)
 inline void
 vncEncodeMgr::SetQualityLevel(int level)
 {
-	ShadowBotConfig* config = ShadowBotConfig::getInstance();
-	if (config != nullptr)
-	{
-		config->getQualityLevel(m_compresslevel);
-	}
-	else
-	{
-		m_compresslevel = 3;
-	}
-
+#ifndef __SHADOWBOT_BUILD__
+	m_qualitylevel = (level >= 0 && level <= 9) ? level : -1;
 	m_finequalitylevel = coarsequal2finequal[level];
 	//m_qualitylevel = (level >= 0 && level <= 9) ? level :3;
 	m_subsampling = coarsequal2subsamp[level];
+#else
+	ShadowBotConfig* config = ShadowBotConfig::getInstance();
+	if (config != nullptr)
+	{
+		config->getQualityLevel(m_qualitylevel);
+	}
+	else
+	{
+		m_qualitylevel = 3;
+	}
+
+	//m_finequalitylevel = coarsequal2finequal[m_qualitylevel];
+	m_finequalitylevel = 15;
+
+	//m_subsampling = coarsequal2subsamp[m_qualitylevel];
+	m_subsampling = SUBSAMP_4X;
+	
+#endif // __SHADOWBOT_BUILD__
+
 	if (m_encoder != NULL) {
 		m_encoder->SetQualityLevel(m_qualitylevel);
 		m_encoder->SetFineQualityLevel(m_finequalitylevel);
