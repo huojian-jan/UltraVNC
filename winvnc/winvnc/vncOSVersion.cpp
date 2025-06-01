@@ -74,6 +74,7 @@ VNC_OSVersion::VNC_OSVersion()
 	OS_WIN10_TRANS = false;
 	OSVERSIONINFO OSversion;	
 	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+	//这个函数在win8之后已经废弃了，官方推荐使用VersionHelpers.h中的工具函数来获取系统版本信息
 	GetVersionEx(&OSversion);
 	OS_WINPE = isWINPE();
 
@@ -114,6 +115,8 @@ VNC_OSVersion::~VNC_OSVersion()
 	ResetAero();
 	UnloadDM();
 }
+
+//Aero是windows上一个透明玻璃的特效，从windowsvisa开始引入的
 
 void
 VNC_OSVersion::SetAeroState()
@@ -196,6 +199,7 @@ VNC_OSVersion::ResetAero(VOID)
 		 else OS_AERO_ON=false;	
         
  } 
+
 
 HWND GetConsoleHwnd(void)
 {

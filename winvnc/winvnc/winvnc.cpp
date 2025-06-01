@@ -226,6 +226,17 @@ bool return2(bool value)
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
 //init commit for yingdao_vnc
+
+//HINSTANCE本质上是一个无符号整形，代表的是当前进程的实例
+//在 16 位 Windows（Windows 3.x） 中，hPrevInstance 用于指向程序是否已经在运行（多实例判断）。
+// 如果程序已经在运行，hPrevInstance 就会是之前实例的句柄，否则为 NULL。
+//但在 32 位和 64 位的 Windows（即 Win32/Win64）中：
+//每个进程都有自己独立的地址空间，不再共享数据段。
+//所以 hPrevInstance 永远为 NULL，保留这个参数只是为了兼容旧代码。
+
+//iCmdShow,这是一个 整数标志值，告诉你程序应该如何显示主窗口，常见值包括：
+
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2, int iCmdShow)
 {
 	try {
@@ -238,6 +249,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			return return2(true);
 		}
 		// make vnc last service to stop
+		//当系统关机或者用户注销时，设置当前进程的关闭顺序
 		SetProcessShutdownParameters(0x100, false);
 		// handle dpi on aero
 		HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
@@ -302,18 +314,40 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		hInstResDLL = NULL;
 
 		//limit the vnclang.dll searchpath to avoid
-		char szCurrentDir[MAX_PATH];
+		char szCurrentDir[MAX_PATH];//变量前面的sz表示 zero terminated string
 		char szCurrentDir_vnclangdll[MAX_PATH];
+
+		//这个函数会返回当前进程的完整路径，类似于D:\Desktop\temp\learn_cpp\x64\Debug\learn_cpp.exe
 		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
 		{
+			//strrchr函数会查找给定字符串,也就是会找到最后一个斜杠
 			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
+			*p = '\0';//把第一个斜杠后面的部分加上\0来表示字符串结束，相当于把后面的文件名部分去掉了
 		}
+
+		//此时szCurrentDir中保存的是当前进程所在的文件夹目录
 		strcpy_s(szCurrentDir_vnclangdll, szCurrentDir);
 		strcat_s(szCurrentDir_vnclangdll, "\\");
 		strcat_s(szCurrentDir_vnclangdll, "vnclang_server.dll");
 
+		//此时szCurrentDir_vnclangdll是完整的路径
+		//当dll路径不存在时，LoadLibrary函数不会报错，但是返回值是NULL,具体的报错信息可以通过GetLastError的方式来获取
 		hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
+		//DWORD err = GetLastError();
+		//LPVOID lpMsgBuf;
+		// 
+		// //FormatMessageA函数可以把GetLastError返回的错误码进程格式化，转成可读友好的字符串信息
+		//FormatMessageA(
+		//	FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		//	NULL,
+		//	err,
+		//	MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		//	(LPSTR)&lpMsgBuf,
+		//	0, NULL);
+		//printf("LoadLibrary failed: %s\n", (char*)lpMsgBuf);
+		// 
+		// LocalFree函数通常用来释放由API分配的内存空间
+		//LocalFree(lpMsgBuf);
 
 		if (hInstResDLL == NULL)
 		{
@@ -322,6 +356,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		//	RegisterLinkLabel(hInstResDLL);
 
 			//Load all messages from ressource file
+		//加载可以做本地化的资源
 		Load_Localization(hInstResDLL);
 
 		char WORKDIR[MAX_PATH];
@@ -332,7 +367,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			*p = '\0';
 		}
 		char progname[MAX_PATH];
-		strncpy_s(progname, WORKDIR, sizeof progname);
+		strncpy_s(progname, WORKDIR, sizeof(progname));
 		progname[MAX_PATH - 1] = 0;
 		vnclog.SetFile();
 
@@ -367,6 +402,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#ifdef SC_20
 		char* szCmdLine = ScSelect::InitSC(hInstance, szCmdLine2);
 	#else
+		//char*指针可以互相赋值，因为char*的结束位置可以通过\0来判断，但是其他类型的数组指针赋值长度会丢失
 		char* szCmdLine = szCmdLine2;
 	#endif
 		// look up the current service name in the registry.
@@ -384,6 +420,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			if (szCmdLine[i] <= ' ')
 				continue;
 			argfound = TRUE;
+
+			//解析-inifile参数
 			if (strncmp(&szCmdLine[i], winvncinipath, strlen(winvncinipath)) == 0)
 			{
 				char filepath[MAX_PATH];
@@ -392,18 +430,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				char Path[_MAX_PATH];
 				char FileName[_MAX_PATH];
 				char FileExt[_MAX_PATH];
+				//从一个完整的路径上解析各个部分
 				_splitpath_s(&(szCmdLine[i + 1]), Drv, Path, FileName, FileExt);
 				char* p = strchr(FileExt, ' ');
 				if (p) *p = 0;
 				_makepath_s(filepath, Drv, Path, FileName, FileExt);
+				//使用_strdup函数在内存的堆空间中复制一份一样的字符产，然后返回对应的指针，注意这个指针释放手动释放
 				g_szIniFile = _strdup(filepath);
-				i += strlen(filepath);
+				i += strlen(filepath); //游标挪到下一个参数的位置
 	#ifdef CRASHRPT
 				crUninstall();
 	#endif
 				continue;
 			}
 
+			//解析-settingshelper参数
 			if (strncmp(&szCmdLine[i], winvncSettingshelper, strlen(winvncSettingshelper)) == 0)
 			{
 				Sleep(3000);
@@ -417,6 +458,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 	#ifndef SC_20
+			//解析-stopservicehelper参数
 			if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
 			{
 				Sleep(3000);
