@@ -36,7 +36,7 @@
 //  This way we can use UAC and user/passwd
 //	Runas is standard OS, so no security risk
 
-HWND G_MENU_HWND = NULL;
+HWND G_MENU_HWND = NULL; //全局的菜单窗口的句柄
 char* MENU_CLASS_NAME = "WinVNC Tray Icon";
 bool ClientTimerReconnect = false;
 bool allowMultipleInstances = false;
@@ -988,6 +988,8 @@ namespace postHelper {
 }
 
 namespace processHelper {
+
+
 	DWORD GetExplorerLogonPid()
 	{
 		char alternate_shell[129];
@@ -1060,6 +1062,8 @@ namespace processHelper {
 		return 0;
 	}
 
+
+
 	BOOL GetCurrentUser(char* buffer, UINT size) // RealVNC 336 change
 	{
 		BOOL	g_impersonating_user = 0;
@@ -1116,6 +1120,8 @@ namespace processHelper {
 		return TRUE;
 	}
 
+
+
 	BOOL CurrentUser(char* buffer, UINT size)
 	{
 		BOOL result = GetCurrentUser(buffer, size);
@@ -1125,14 +1131,21 @@ namespace processHelper {
 		return result;
 	}
 
+	/// <summary>
+	/// 判断vnc的服务是否安装
+	/// </summary>
+	/// <returns></returns>
 	bool IsServiceInstalled()
 	{
 		BOOL bResult = FALSE;
 #ifndef SC_20
+		//Service Control Manager
+		//打开windows的服务管理数据库
 		SC_HANDLE hSCM = ::OpenSCManager(NULL, // local machine
 			NULL, // ServicesActive database
 			SC_MANAGER_ENUMERATE_SERVICE); // full access
 		if (hSCM) {
+			//尝试打开vnc的服务，打开成功说明已经安装了了
 			SC_HANDLE hService = ::OpenService(hSCM,
 				UltraVNCService::service_name,
 				SERVICE_QUERY_CONFIG);
@@ -1146,30 +1159,42 @@ namespace processHelper {
 		return (FALSE != bResult);
 	}
 
+
+	/// <summary>
+	/// 获取当前激活的用户会话id，强调的是登录物理机器的用户
+	/// </summary>
+	/// <returns></returns>
 	DWORD GetCurrentConsoleSessionID()
 	{
 		return WTSGetActiveConsoleSessionId();
 	}
 
+	/// <summary>
+	/// 用于判断计算机是否处于锁屏状态
+	/// </summary>
+	/// <returns></returns>
 	BOOL IsWSLocked()
 	{
 		bool bLocked = false;
 
-		// Original code does not work if running as a service...  apparently no access to the desktop.
-		// Alternative is to check for a running LogonUI.exe (if present, system is either not logged in or locked)
+		// 创建系统进程快照
 		HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
+		// 初始化进程结构体
 		PROCESSENTRY32W procentry{};
 		procentry.dwSize = sizeof(procentry);
 
+		// 遍历进程列表
 		if (Process32FirstW(hSnap, &procentry)) {
 			do {
+				// 检查是否存在 LogonUI.exe 进程
 				if (!_wcsicmp(procentry.szExeFile, L"LogonUI.exe")) {
 					bLocked = true;
 					break;
 				}
 			} while (Process32NextW(hSnap, &procentry));
 		}
+		CloseHandle(hSnap);
 		return bLocked;
 	}
 }

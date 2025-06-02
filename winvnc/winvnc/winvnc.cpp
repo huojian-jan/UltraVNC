@@ -462,6 +462,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
 			{
 				Sleep(3000);
+				//TODO(huojian:搞清楚Service相关的win32接口，找几个相关的开源代码库学习源码)
 				serviceHelpers::Set_stop_service_as_admin();
 	#ifdef CRASHRPT
 				crUninstall();
@@ -470,9 +471,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			}
 	#endif
 
+			//解析 -kill参数
 			if (strncmp(&szCmdLine[i], winvncKill, strlen(winvncKill)) == 0)
 			{
 				static HANDLE		hShutdownEventTmp;
+				//TODO(huojian:这里设置事件的逻辑应该是给后面的service里面的死循环检查的时候会检查到，然后退出)
 				hShutdownEventTmp = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
 				SetEvent(hShutdownEventTmp);
 				CloseHandle(hShutdownEventTmp);
@@ -491,7 +494,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
+	
 
+			//解析-openhomepage参数
 			if (strncmp(&szCmdLine[i], winvncopenhomepage, strlen(winvncopenhomepage)) == 0)
 			{
 				Open_homepage();
@@ -501,6 +506,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
+			//解析-openforum参数
 			if (strncmp(&szCmdLine[i], winvncopenforum, strlen(winvncopenforum)) == 0)
 			{
 				Open_forum();
@@ -523,6 +529,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			}
 	#endif
 	#ifndef SC_20
+			//解析-startservicehelper参数
 			if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
 			{
 				Sleep(3000);
@@ -533,6 +540,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
+			//解析-installhelper参数
 			if (strncmp(&szCmdLine[i], winvncInstallServiceHelper, strlen(winvncInstallServiceHelper)) == 0)
 			{
 				//Sleeps are realy needed, else runas fails...
@@ -543,6 +551,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
+
+			//解析-uninstallhelper参数
 			if (strncmp(&szCmdLine[i], winvncUnInstallServiceHelper, strlen(winvncUnInstallServiceHelper)) == 0)
 			{
 				Sleep(3000);
@@ -552,6 +562,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
+
+
+			//解析-softwarecadhelper参数
 			if (strncmp(&szCmdLine[i], winvncSoftwarecadHelper, strlen(winvncSoftwarecadHelper)) == 0)
 			{
 				Sleep(3000);
@@ -561,6 +574,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
+
+			//解析-delsoftwarecadhelper参数
 			if (strncmp(&szCmdLine[i], winvncdelSoftwarecadHelper, strlen(winvncdelSoftwarecadHelper)) == 0)
 			{
 				Sleep(3000);
@@ -570,6 +585,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
+
+			//解析-rebootsafehelper参数
 			if (strncmp(&szCmdLine[i], winvncRebootSafeHelper, strlen(winvncRebootSafeHelper)) == 0)
 			{
 				Sleep(3000);
@@ -580,6 +597,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
+			//解析-rebootforcehelper参数
 			if (strncmp(&szCmdLine[i], winvncRebootForceHelper, strlen(winvncRebootForceHelper)) == 0)
 			{
 				Sleep(3000);
@@ -589,6 +607,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
+
+			//解析-secturityeditorhelper参数
 			if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditorHelper)) == 0)
 			{
 				Sleep(3000);
@@ -599,6 +619,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 	#endif
+			//解析securityeditor参数
 			if (strncmp(&szCmdLine[i], winvncSecurityEditor, strlen(winvncSecurityEditor)) == 0)
 			{
 				typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
@@ -623,6 +644,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
+			//解析-settings参数
 			if (strncmp(&szCmdLine[i], winvncSettings, strlen(winvncSettings)) == 0)
 			{
 				char mycommand[MAX_PATH];
@@ -635,6 +657,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
+			//解析-dsmpluginhelper参数
 			if (strncmp(&szCmdLine[i], dsmpluginhelper, strlen(dsmpluginhelper)) == 0)
 			{
 				char mycommand[MAX_PATH];
@@ -647,6 +670,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
+			//解析dsmpluginstance参数
 			if (strncmp(&szCmdLine[i], dsmplugininstance, strlen(dsmplugininstance)) == 0)
 			{
 				char mycommand[MAX_PATH];
@@ -660,6 +684,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			}
 
 	#ifndef SC_20
+			//解析-softwarecad参数
 			if (strncmp(&szCmdLine[i], winvncSoftwarecad, strlen(winvncSoftwarecad)) == 0)
 			{
 				vncCad::Enable_softwareCAD();
@@ -714,11 +739,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
+			//解析-installdriver参数
 			if (strncmp(&szCmdLine[i], winvncInstallDriver, strlen(winvncInstallDriver)) == 0) {
 				VirtualDisplay::InstallDriver(true);
 				return return2(0);
 			}
 
+			//解析-install参数
 			if (strncmp(&szCmdLine[i], winvncInstallService, strlen(winvncInstallService)) == 0)
 			{
 				// rest of command line service name, if provided.
@@ -745,6 +772,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				}
 				// if a service name is supplied, and it differs except in case from
 				// the default, use the supplied service name instead
+
+				//_strcmpi是一个不区分大小写的字符串比较函数
 				if (*pServiceName && (_strcmpi(pServiceName, UltraVNCService::service_name) != 0))
 				{
 					strncpy_s(UltraVNCService::service_name, 256, pServiceName, 256);
@@ -865,6 +894,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				continue;
 			}
 
+			//解析-multi参数，允许启动多个进程
 			if (strncmp(&szCmdLine[i], winvncmulti, strlen(winvncmulti)) == 0)
 			{
 				allowMultipleInstances = true;
@@ -1517,10 +1547,10 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 
 int WinVNCAppMain()
 {
-	vnclog.SetMode(settings->getDebugMode());
-	vnclog.SetPath(settings->getDebugPath());
-	vnclog.SetLevel(settings->getDebugLevel());
-	vnclog.SetVideo(settings->getAvilog());
+	vnclog.SetMode(settings->getDebugMode()); //ini文件中读取调试模式
+	vnclog.SetPath(settings->getDebugPath());//ini文件中读取日志路径
+	vnclog.SetLevel(settings->getDebugLevel());//ini文件中读取日志级别
+	vnclog.SetVideo(settings->getAvilog());//TODO(huojian:搞清楚这个avi是啥玩意儿)
 
 	vnclog.Print(-1, VNCLOG("WinVNCAPPMain-----Application started\n"));
 #ifdef CRASH_ENABLED
@@ -1542,7 +1572,7 @@ int WinVNCAppMain()
 		}
 	}
 
-	//vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Previous instance checked - Trying to create server\n"));
+	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Previous instance checked - Trying to create server\n"));
 	// CREATE SERVER
 	vncServer server;
 
@@ -1554,13 +1584,17 @@ int WinVNCAppMain()
 	// sf@2007 - New impersonation thread stuff for tray icon & menu
 	// Subscribe to shutdown event
 	hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
-	if (hShutdownEvent) ResetEvent(hShutdownEvent);
-	//vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
+	if (hShutdownEvent)
+	{
+		ResetEvent(hShutdownEvent);
+	}
+
+	vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
 	// Create the timer that looks periodicaly for shutdown event
 	mmRes = -1;
 	//InitSDTimer();
 
-	while ( !fShutdownOrdered)
+	while ( !fShutdownOrdered)//TODO(huojian:这个布尔值啥意思)
 	{
 		//vnclog.Print(LL_STATE, VNCLOG("################## Creating Imp Thread : %d \n"), nn);
 

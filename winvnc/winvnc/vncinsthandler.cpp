@@ -30,8 +30,7 @@
 #include "stdhdrs.h"
 #include "vncinsthandler.h"
 
-// Name of the mutex
-
+// Name of the mutex,保证进程单开的mutex
 const char mutexname [] = "WinVNC_Win32_Instance_Mutex";
 
 // The class methods
@@ -44,15 +43,17 @@ vncInstHandler::~vncInstHandler()
 {
 	if (mutex)
 	{
+		//调用RelaseMutex的API，退出占有的mutex锁
 		ReleaseMutex(mutex);
-		CloseHandle (mutex);
+		CloseHandle (mutex);//关掉mutex句柄，防止资源泄漏
 	}
 }
+
 
 BOOL
 vncInstHandler::Init()
 {
-	// Create the named mutex
+	//创建命名的Mutex
 	mutex = CreateMutex(NULL, FALSE, mutexname);
 	if (mutex == NULL)
 		return FALSE;
@@ -60,6 +61,5 @@ vncInstHandler::Init()
 	// Check that the mutex didn't already exist
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 		return FALSE;
-
 	return TRUE;
 }

@@ -42,11 +42,11 @@ class vncInstHandler
 {
 	
 public:
-	vncInstHandler();
-	~vncInstHandler();
+	vncInstHandler();//默认构造函数
+	~vncInstHandler();//默认析构函数
 	// Constructor/destructor
-	BOOL Init();
-	HANDLE mutex;
+	BOOL Init();//初始化
+	HANDLE mutex;//公共的mutex
 };
 
 #endif // _WINVNC_VNCINSTHANDLER

@@ -69,13 +69,14 @@ extern wchar_t g_hookstring[16];
 static BOOL AeroWasEnabled = FALSE;
 
 static unsigned int WM_TASKBARCREATED = 0;
-void Open_homepage();
-void Open_forum();
+void Open_homepage(); //打开主页
+void Open_forum(); //打开论坛
 
 //HACK to use name in autoreconnect from service with dyn dns
 extern char dnsname[255];
 
 BOOL pfnDwmEnableCompositiond = FALSE;
+
 static inline VOID DisableAero(VOID)
 {
 	if (!(SUCCEEDED(DwmIsCompositionEnabled(&pfnDwmEnableCompositiond))))
@@ -96,6 +97,15 @@ static inline VOID ResetAero(VOID)
 }
 
 // adzm - 2010-07 - Disable more effects or font smoothing
+
+/// <summary>
+/// 判断当前的线程绑定的桌面是否是用户桌面
+/// windows常见的桌面名有这些：
+/// Default:用户登录成功后看到的主桌面。桌面图标、任务栏、所有常见应用都在这里。
+/// Winlogon:登录界面、Ctrl+Alt+Del 界面所在的桌面。普通程序访问不到。
+/// ScreenSaver:屏保程序运行时的桌面。
+/// </summary>
+/// <returns></returns>
 static bool IsUserDesktop()
 {
 	//only kill wallpaper if desktop is user desktop
@@ -164,10 +174,14 @@ vncMenu::vncMenu(vncServer* server)
 {
 	vnclog.Print(LL_INTERR, VNCLOG("vncmenu(server)\n"));
 	ports_set = false;
+
+	//跟com编程相关的api,后期再看
+	//TODO(huojian:后续再搞清楚com之类的概念)
 	CoInitialize(0);
 	IsIconSet = false;
 	IconFaultCounter = 0;
 
+	//TODO(huojian:后续再看)
 	ChangeWindowMessageFilter(postHelper::MENU_AUTO_RECONNECT_MSG, MSGFLT_ADD);
 	ChangeWindowMessageFilter(postHelper::MENU_STOP_RECONNECT_MSG, MSGFLT_ADD);
 	ChangeWindowMessageFilter(postHelper::MENU_STOP_ALL_RECONNECT_MSG, MSGFLT_ADD);
@@ -193,18 +207,18 @@ vncMenu::vncMenu(vncServer* server)
 
 	wndclass.cbSize = sizeof(wndclass);
 	wndclass.style = 0;
-	wndclass.lpfnWndProc = vncMenu::WndProc;
+	wndclass.lpfnWndProc = vncMenu::WndProc;//菜单窗口的消息处理函数
 	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = 0;
-	wndclass.hInstance = hAppInstance;
-	wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hInstance = hAppInstance;//设置HInstance
+	wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);//加载icon资源
+	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);//加载鼠标资源
 	wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	wndclass.lpszMenuName = (const char*)NULL;
-	wndclass.lpszClassName = MENU_CLASS_NAME;
-	wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.lpszClassName = MENU_CLASS_NAME; //设置窗口名称
+	wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION); //设置小图标
 
-	RegisterClassEx(&wndclass);
+	RegisterClassEx(&wndclass); //注册窗口
 
 	m_hwnd = CreateWindow(MENU_CLASS_NAME,
 		MENU_CLASS_NAME,
@@ -219,14 +233,16 @@ vncMenu::vncMenu(vncServer* server)
 	G_MENU_HWND = m_hwnd;
 	if (m_hwnd == NULL)
 	{
-		PostQuitMessage(0);
+		PostQuitMessage(0); //如果菜单窗口创建失败，发送QuitMessage的方式退出
 		return;
 	}
 
 	// record which client created this window
+	//底层使用的是SetWindowLongPtr，常用于设置窗口相关数据的
 	helper::SafeSetWindowUserData(m_hwnd, (LONG_PTR)this);
 
 	// Ask the server object to notify us of stuff
+	
 	server->AddNotify(m_hwnd);
 
 	// Initialise the properties dialog object
@@ -235,6 +251,7 @@ vncMenu::vncMenu(vncServer* server)
 		PostQuitMessage(0);
 		return;
 	}
+
 	if (!m_propertiesPoll.Init(m_server))
 	{
 		PostQuitMessage(0);
@@ -267,13 +284,17 @@ vncMenu::vncMenu(vncServer* server)
 	{
 		m_winvnc_icon = (HICON)LoadImage(NULL, "icon1.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
 			GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE | LR_DEFAULTCOLOR);
+
 		m_flash_icon = (HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
 			GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE | LR_DEFAULTCOLOR);
+
 		// [v1.0.2-jp1 fix]
 		//if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
 		if (!m_winvnc_icon) m_winvnc_icon = (HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
 			GetSystemMetrics(SM_CXSMICON),
 			GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+
+
 		// [v1.0.2-jp1 fix]
 		//if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
 		if (!m_flash_icon) m_flash_icon = (HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
